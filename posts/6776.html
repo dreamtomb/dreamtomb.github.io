@@ -1,0 +1,182 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>deep reinforcement learning | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="强化学习算法分类强化学习算法的分类图如下图所示：  model-based &amp;&amp; model-free在马尔可夫决策过程（MDP）中，有五个关键元素：$S,A,P,R,\gamma$，分别代表状态空间，动作空间，状态转移函数，奖励函数以及折扣因子（防止奖励的累加和趋于无穷导致无偏向）。当这些元素全部已知时，模型就是已知的，可以无需和环境交互，直接在模型上进行计算，比如使用value">
+<meta property="og:type" content="article">
+<meta property="og:title" content="deep reinforcement learning">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/6776.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="强化学习算法分类强化学习算法的分类图如下图所示：  model-based &amp;&amp; model-free在马尔可夫决策过程（MDP）中，有五个关键元素：$S,A,P,R,\gamma$，分别代表状态空间，动作空间，状态转移函数，奖励函数以及折扣因子（防止奖励的累加和趋于无穷导致无偏向）。当这些元素全部已知时，模型就是已知的，可以无需和环境交互，直接在模型上进行计算，比如使用value">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-05-29T03:12:09.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:37.035Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="RL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/6776.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'deep reinforcement learning',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:37'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">deep reinforcement learning</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-05-29T03:12:09.000Z" title="发表于 2023-05-29 11:12:09">2023-05-29</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:37.035Z" title="更新于 2024-03-01 17:36:37">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/RL/">RL</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>8分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="deep reinforcement learning"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="强化学习算法分类"><a href="#强化学习算法分类" class="headerlink" title="强化学习算法分类"></a>强化学习算法分类</h1><p>强化学习算法的分类图如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/6776/classification.png" alt="classification"></p>
+<h2 id="model-based-model-free"><a href="#model-based-model-free" class="headerlink" title="model-based &amp;&amp; model-free"></a>model-based &amp;&amp; model-free</h2><p>在马尔可夫决策过程（MDP）中，有五个关键元素：$S,A,P,R,\gamma$，分别代表状态空间，动作空间，状态转移函数，奖励函数以及折扣因子（防止奖励的累加和趋于无穷导致无偏向）。当这些元素全部已知时，模型就是已知的，可以无需和环境交互，直接在模型上进行计算，比如使用value iteration或者policy iteration等方法。但是现实中agent往往无法知道状态转移函数以及奖励函数，这时模型就是未知的，需要通过和环境交互，不断试错，观察环境相关信息并利用反馈的奖励信号来不断学习。如果通过学习习得了状态转移函数以及奖励函数，那么就可以使用前述方法进行求解，这就是model-based方法。如果不对环境进行建模，直接寻找最优策略，那就是model-free方法。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/6776/ModelClassification.png" alt="ModelClassification"></p>
+<h2 id="value-based-policy-based"><a href="#value-based-policy-based" class="headerlink" title="value-based &amp;&amp; policy-based"></a>value-based &amp;&amp; policy-based</h2><p>基于价值的方法需要对动作价值函数$Q^\pi(s,a)$进行优化，其优点在于采样效率相对较高，值函数估计方差小，不易陷入局部最优；缺点是它通常不能处理连续动作空间问题，且最终的策略通常为确定性策略而不是概率分布的形式。基于策略的方法直接对策略进行优化，通过对策略迭代更新，实现累积奖励最大化。与基于价值的方法相比，基于策略的方法具有策略参数化简单、收敛速度快的优点，且适用于连续或高维的动作空间。除了基于价值的方法和基于策略的方法，更流行的是两者的结合，这衍生出了Actor-Critic方法。Actor-Critic方法结合了两种方法的优点，利用基于价值的方法学习Q值函数或状态价值函数V来提高采样效率（Critic），并利用基于策略的方法学习策略函数（Actor），从而适用于连续或高维的动作空间。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/6776/ValuePolicyClassification.png" alt="ValuePolicyClassification"></p>
+<h2 id="MC-TD"><a href="#MC-TD" class="headerlink" title="MC &amp;&amp; TD"></a>MC &amp;&amp; TD</h2><p>时间差分（Temporal Difference，TD）方法和蒙特卡罗（Monte Carlo，MC）方法最大的不同之处在于如何进行参数更新，蒙特卡罗方法必须等到一条轨迹生成（真实值）后才能更新，而时间差分方法在每一步动作执行都可以通过自举法（估计值）及时更新。这种差异将使时间差分方法具有更大的偏差，而使蒙特卡罗方法具有更大的方差。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/6776/MCDTClassification.png" alt="MCDTClassification"></p>
+<h2 id="on-policy-off-policy"><a href="#on-policy-off-policy" class="headerlink" title="on-policy &amp;&amp; off-policy"></a>on-policy &amp;&amp; off-policy</h2><p>在线策略（On-Policy）方法和离线策略（Off-Policy）方法依据策略学习的方式对强化学习算法进行划分。在线策略方法要求智能体要评估提升的策略和与环境交互的策略必须是相同的，而离线策略方法评估和提升的策略与生成数据的策略是不同的，它可以利用其他智能体与环境交互生成的数据来提升自己的策略。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/6776/OnOffPolicyClassification.png" alt="OnOffPolicyClassification"></p>
+<h1 id="Policy（策略）与Policy-Optimization（策略优化）"><a href="#Policy（策略）与Policy-Optimization（策略优化）" class="headerlink" title="Policy（策略）与Policy Optimization（策略优化）"></a>Policy（策略）与Policy Optimization（策略优化）</h1><p>策略(Policy)是一种从状态(State)到动作(Action)的映射，而所谓的策略优化(Policy Optimization)就是要寻找到最优的映射。策略优化算法大体分为两种：基于value的方法需要对价值函数进行建模和估计，以此为依据制定策略，代表方法有Q-learning和DQN；基于策略的方法则是对策略函数直接进行建模和估计，优化策略函数使奖励最大化，代表方法有REINFORCE和交叉熵算法等。而将二者结合所产生的结构————Actor-Critic则是在Model-free类方法中应用最广的结构，它通过对价值函数的优化来引导策略改进。</p>
+<p>首先回顾一下策略函数、状态价值函数、状态动作价值函数、动态规划、策略评估、策略迭代和价值迭代。</p>
+<p>策略函数（Policy Function）常表示为：$\pi(s):S\rightarrow A$，是从状态集合到动作集合的一个映射，策略函数的最优化是强化学习算法的核心任务。</p>
+<p>状态价值函数（State Value Function）也可简称为价值函数，用于评价策略的优劣。其意义是，当处于状态$s_t$时，从下一个状态$s_{t+1}$开始，直至一个Episode结束，都按照策略$\pi(s)$与env进行交互，将从$s_{t+1}$到$s_\infty$过程中得到的reward的降权值累加起来，取其期望值作为状态$s_t$的价值。</p>
+<p>状态动作价值函数（State-action Value Function）也可简称为Q值函数，是对状态-动作对优劣的评估，相比状态价值函数，除了给定状态外还要给定某个动作$a$。</p>
+<p>动态规划（Dynamic Programming，DP）是一种解决复杂问题的思想方法，其整体思想就是化繁为简，将复杂问题分解为一个个相对简单的子问题，然后通过解决子问题后再串起来，理论上也就解决了整个复杂问题了。所以一个问题要想去用DP去解决的话它必定要满足这两个条件：第一，问题有一定结构并且可以进行拆分成一步步的子问题；第二，子问题需要出现多次并可以用解决方法不断去套用迭代。而MDP刚好符合这两个特征，首先MDP的转移状态可以分解成连续的子状态之间的转移，然后可以用贝尔曼方程不断去套用迭代计算状态和行动的价值函数继而得到单个状态的最优策略，从而最后再全部串起来就ok了。</p>
+<p>策略评估（Policy Evaluation）是做策略迭代的前置任务，在做出最好的选择之前，首先要对所有选择做评估，然后才能进行选择。具体来说就是通过贝尔曼期望方程来迭代计算每个状态的价值函数。</p>
+<p>策略迭代（Policy Iteration），如果我们已经完成了对一个策略的评估，想要提升这个策略怎么办？很好办，那就基于前边得到的评估结果，按照贪心的思想，总是挑往价值函数大的方向走就好啦！每次策略评估之后，从值函数中寻找到可以使后继状态价值增加最多的行为作为新的策略，然后再次评估，以此类推，一直到价值函数不再发生变化为止。</p>
+<p>价值迭代（Value Iteration），这种算法更加简单粗暴，指导思想也很简单，就是使用贝尔曼最优方程，将策略改进视为值函数的改进，每一步都求取最大的值函数。</p>
+<h2 id="Value-based-optimization（基于价值的优化）"><a href="#Value-based-optimization（基于价值的优化）" class="headerlink" title="Value based optimization（基于价值的优化）"></a>Value based optimization（基于价值的优化）</h2><p>基于价值的优化方法往往需要在策略估计和策略提升两个过程之间交替，其大致的解决方法如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/6776/ValueBased.png" alt="ValueBased"></p>
+<p>对于简单且离散的问题（比如4x4迷宫的最短路径问题），直接使用表格方法即可。但是对于复杂或连续的问题就需要进行价值函数的拟合。对于model-free问题，需要使用MC或者TD方法来更新参数，对于model-based的问题，直接用规划方法如策略迭代等来更新参数即可。</p>
+<h2 id="Policy-based-optimization（基于策略的优化）"><a href="#Policy-based-optimization（基于策略的优化）" class="headerlink" title="Policy based optimization（基于策略的优化）"></a>Policy based optimization（基于策略的优化）</h2><p>深度强化学习中的策略可以被分为确定性策略和随机性策略，前者对于某种状态，其能选择的动作是确定的，后者则是不同的动作有不同的概率。在优化过程中，可以使用基于梯度的方法，比如REINFORCE，也可以使用无梯度的方法，比如交叉熵方法。基于策略的优化方法的基本思路和任何启发式算法的思路是一致的，即建立输入和输出之间的可微的参数模型，然后通过梯度优化搜索合适的参数，具体分为三个步骤：首先确立策略模型$\pi_\theta(x)$，然后构建优势评价函数（往往是累积折扣奖励）$metric&#x3D;J(\pi_\theta)$，最后进行参数更新$\theta&#x3D;\theta+\alpha\nabla_\theta J(\pi_\theta)$。其中确立策略模型需要借助神经网络，输入是状态信息，输出是动作的概率分布（以随机性策略为例），即$\pi_\theta:S\rightarrow P(A)$。</p>
+<h3 id="基于梯度的优化"><a href="#基于梯度的优化" class="headerlink" title="基于梯度的优化"></a>基于梯度的优化</h3><p>基于梯度的优化方法是使用在期望回报（总的奖励）上的梯度估计来进行梯度下降以改进策略，而这个期望回报是从采样轨迹中得到的。这里我们把关于策略参数的梯度叫作策略梯度（Policy Gradient）。我们将从一个状态开始的累计折扣奖励表示为$J(\pi)&#x3D;\mathbb{E}_{r\sim\pi}[R(\tau)]$，那么策略梯度$PG$可以表示为$\Delta\theta&#x3D;\alpha\nabla_\theta J(\pi_\theta)&#x3D;\alpha\mathbb{E}_{\tau\sim\pi_\theta}\left[\sum_{t&#x3D;0}^T\nabla_\theta(log\pi_\theta(A_t|S_t))Q^{\pi_\theta}(S_t,A_t)\right]$，这就是最原始的REINFORCE方法。对上述公式的直观解释是：前半部分是一个方向向量，参数在这个方向上更新可以增大或降低给定状态下某个动作发生的可能性；后半部分是一个标量，以累积折扣奖励的大小作为权重；因此这个公式的直观解释就是增大高回报状态-动作对出现的概率，降低低回报状态-动作对出现的概率。</p>
+<h3 id="无梯度优化"><a href="#无梯度优化" class="headerlink" title="无梯度优化"></a>无梯度优化</h3><p>无梯度优化的方法包括交叉熵方法、协方差矩阵自适应方法、爬山法等等，这并非主流方法，因此本文不做涉猎。</p>
+<h2 id="Actor-Critic（AC框架）"><a href="#Actor-Critic（AC框架）" class="headerlink" title="Actor-Critic（AC框架）"></a>Actor-Critic（AC框架）</h2><p>在策略梯度方法中，如果使用MC或TD进行估计，那么产生的更新往往有较大的方差。一种改进方式是使用一个如基于价值的优化中的批判者（Critic）来估计动作价值函数，此时如果我们还采用了参数化的价值函数近似方法，就构成了Actor-Critic结构，它是一个既基于策略也基于价值的方法。它同时学习Actor函数————策略函数$\pi(s)$以及Critic函数————状态价值函数$V(s)$，并使用自举法(Bootstrapping)的思想来估计Q值函数。相比于策略梯度方法，最重要的改动在于提供了多种可选择的Critic函数（原Q值函数也可以作为Critic函数）：总回报、某个动作之后的回报、TD残差等等，当选择的Critic函数是以牺牲偏差为代价减小方差的几种函数时，就得到了经典的AC方法。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/6776.html">https://dreamtomb.github.io/posts/6776.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/RL/">RL</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/7641.html" title="在clash 代理模式下pip安装库时报错的解决办法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">在clash 代理模式下pip安装库时报错的解决办法</div></div></a></div><div class="next-post pull-right"><a href="/posts/17917.html" title="hexo使用中遇到的问题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">hexo使用中遇到的问题</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/6740.html" title="Constitutional AI Harmlessness from AI Feedback"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-09</div><div class="title">Constitutional AI Harmlessness from AI Feedback</div></div></a></div><div><a href="/posts/24093.html" title="SAC &amp;&amp; DPG论文阅读"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-05</div><div class="title">SAC &amp;&amp; DPG论文阅读</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95%E5%88%86%E7%B1%BB"><span class="toc-number">1.</span> <span class="toc-text">强化学习算法分类</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#model-based-model-free"><span class="toc-number">1.1.</span> <span class="toc-text">model-based &amp;&amp; model-free</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#value-based-policy-based"><span class="toc-number">1.2.</span> <span class="toc-text">value-based &amp;&amp; policy-based</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MC-TD"><span class="toc-number">1.3.</span> <span class="toc-text">MC &amp;&amp; TD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#on-policy-off-policy"><span class="toc-number">1.4.</span> <span class="toc-text">on-policy &amp;&amp; off-policy</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Policy%EF%BC%88%E7%AD%96%E7%95%A5%EF%BC%89%E4%B8%8EPolicy-Optimization%EF%BC%88%E7%AD%96%E7%95%A5%E4%BC%98%E5%8C%96%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">Policy（策略）与Policy Optimization（策略优化）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Value-based-optimization%EF%BC%88%E5%9F%BA%E4%BA%8E%E4%BB%B7%E5%80%BC%E7%9A%84%E4%BC%98%E5%8C%96%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">Value based optimization（基于价值的优化）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Policy-based-optimization%EF%BC%88%E5%9F%BA%E4%BA%8E%E7%AD%96%E7%95%A5%E7%9A%84%E4%BC%98%E5%8C%96%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">Policy based optimization（基于策略的优化）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%A2%AF%E5%BA%A6%E7%9A%84%E4%BC%98%E5%8C%96"><span class="toc-number">2.2.1.</span> <span class="toc-text">基于梯度的优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E6%A2%AF%E5%BA%A6%E4%BC%98%E5%8C%96"><span class="toc-number">2.2.2.</span> <span class="toc-text">无梯度优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Actor-Critic%EF%BC%88AC%E6%A1%86%E6%9E%B6%EF%BC%89"><span class="toc-number">2.3.</span> <span class="toc-text">Actor-Critic（AC框架）</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

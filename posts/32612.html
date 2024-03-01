@@ -1,0 +1,269 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>A Survey of Large Language Models论文笔记 | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="A Survey of Large Language Models论文笔记整篇综述的结构如下：  Introduction(2页) Overview(1.5页) Resources of LLMs(4页) Publicly available model checkpoints or APIs Commonly used corpora Library resource   Pre-trainin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Survey of Large Language Models论文笔记">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/32612.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="A Survey of Large Language Models论文笔记整篇综述的结构如下：  Introduction(2页) Overview(1.5页) Resources of LLMs(4页) Publicly available model checkpoints or APIs Commonly used corpora Library resource   Pre-trainin">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-04-06T00:32:41.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:36.999Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/32612.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'A Survey of Large Language Models论文笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:36'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">A Survey of Large Language Models论文笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-06T00:32:41.000Z" title="发表于 2023-04-06 08:32:41">2023-04-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:36.999Z" title="更新于 2024-03-01 17:36:36">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/LLM/">LLM</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="A Survey of Large Language Models论文笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="A-Survey-of-Large-Language-Models论文笔记"><a href="#A-Survey-of-Large-Language-Models论文笔记" class="headerlink" title="A Survey of Large Language Models论文笔记"></a>A Survey of Large Language Models论文笔记</h1><p>整篇综述的结构如下：</p>
+<ol>
+<li>Introduction(2页)</li>
+<li>Overview(1.5页)</li>
+<li>Resources of LLMs(4页)<ul>
+<li>Publicly available model checkpoints or APIs</li>
+<li>Commonly used corpora</li>
+<li>Library resource</li>
+</ul>
+</li>
+<li>Pre-training(7.5页)<ul>
+<li>Data collection</li>
+<li>Architecture</li>
+<li>Model Training</li>
+</ul>
+</li>
+<li>Adaptation tuning of LLMs(5页)<ul>
+<li>Instruction tuning</li>
+<li>Alignment tuning</li>
+</ul>
+</li>
+<li>Utilization(3.5页)<ul>
+<li>In-context learning</li>
+<li>Chain-of-thought prompting</li>
+</ul>
+</li>
+<li>Capacity evaluation(7.5页)<ul>
+<li>Basic evaluation tasks</li>
+<li>Advanced ability evaluation</li>
+<li>Public benchmarks and empirical analysis</li>
+</ul>
+</li>
+<li>Conclusion and future directions(2页)</li>
+</ol>
+<p>这篇博客主要关注论文的第五、六部分。</p>
+<h2 id="Adaptation-Tuning-Of-LLMs"><a href="#Adaptation-Tuning-Of-LLMs" class="headerlink" title="Adaptation Tuning Of LLMs"></a>Adaptation Tuning Of LLMs</h2><p>以往的诸多工作已经证明了，经过预训练的LLMs已经学习到了足够多的相关知识，拥有足够的潜力去完成few-shot甚至是zero-shot任务，但是根据不同的任务目标进行适应性的调整可以更大程度地发掘LLMs的潜力。在这一部分中，作者总结了两种方法来让预训练模型和下游任务相适应，这两种方法分别是instruction tuning和alignment tuning，前者的目标是增强或者说是解锁LLMs的潜能（充分利用LLMs学习到的知识），后者的目标是让LLMs的行为朝人类的价值观靠拢（避免各种歧视或者其他错误）。</p>
+<h3 id="Instruction-Tuning"><a href="#Instruction-Tuning" class="headerlink" title="Instruction Tuning"></a>Instruction Tuning</h3><p>作者首先列举了几个用于instruction tuning的数据集：Natural Instructions v2、The Flan Collection、CrossFit、P3、ExMix等。 </p>
+<p>Instruction tuning本质上是一种在一个以自然语言形式格式化的集合上微调预训练LLMs的方法。它与supervised fine-tuning和multi-task prompted training高度相关。使用Instruction tuning的步骤分为两步：首先筹集或者构造instruction格式的实例，然后用这些格式化的实例来有监督地微调预训练LLMs。通过Instruction tuning，模型可以获得很强的，对于其他任务的泛化能力。下图就是对于instance formatting的说明以及构造这样实例的两种方法。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/32612/instance_formatting.png" alt="instance_formatting"></p>
+<h4 id="Formatted-Instance-Construction"><a href="#Formatted-Instance-Construction" class="headerlink" title="Formatted Instance Construction"></a>Formatted Instance Construction</h4><p>一个指令格式化的实例由一个任务描述（也就是instruction），一个输入输出对，以及一些示范（可选）组成。下面介绍了两种构造实例的方法。</p>
+<ol>
+<li><strong>Formatting Existing Datasets.</strong> 这种方法需要使用人手写的任务描述来增强有标签数据集，具体来说是通过解释任务目标来指示LLMs理解任务，就如同上图中所示，为每一个Q&amp;A任务中的实例添加任务描述：please answer this question。现有工作证明了，经过instruction tuning之后，LLMs可以在其他任务上根据他们的任务描述表现得很好，而且去掉任务描述会导致模型性能急剧下降。在这里，作者提供了一个很好的平台PromptSource，通过这个平台可以高效的创建、分享、验证不同数据集的任务描述。</li>
+<li><strong>Formatting Human Needs.</strong> 根据公共数据集构造的指令缺乏多样性，且很多跟人类的真实需求不匹配，因此有了这种方法，将用户提交给OpenAI API的查询作为任务描述，此外还要求标注人员为现实生活中的例子构造指令，接着由另一组标注人员人工回答这些问题作为输出。这样就得到了一个实例：instruction是用户的问题，output是人工的回答。</li>
+</ol>
+<p>下面是一些构造实例的关键因素：</p>
+<ol>
+<li><strong>Scaling the instructions.</strong> 以往工作表明增大任务的数量可以增强LLMs的泛化能力，模型的性能表现随着任务数量的增加而先增加后不变。一个合理的推测是，一定数量的代表性任务就可以提供相对足够的知识了。此外还可以通过增加任务描述的多样性来提升模型的性能表现。但是需要注意的是，每个任务的实例数不能太多（例如数十万），否则会导致过拟合，损害模型性能。</li>
+<li><strong>Formatting design.</strong> 指令的格式也会影响模型的泛化性能，必选的任务描述是模型理解任务的关键点，可选的示例可以促进模型对任务的理解，并降低其对指令的敏感性。但是如果将其他的东西，比如原因，建议等加入指令可能甚至会产生不利影响。此外，最近爆火的CoT可以被用于一些推理任务中，以激发模型的逐步推理能力。</li>
+</ol>
+<p>总的来说，<strong>指令的多样性比实例的数量更加重要</strong>，InstructGPT和Alpaca就是例子，它们的指令实例数量不多但足够多样化，因此都有着不错的表现。此外，<strong>由标注人员根据人类真实需求构建的数据集比使用特定任务数据集效果更好</strong>，因此可以通过重用已有的格式化数据集以及使用现有LLMs自动构建指令来构造数据集（类似借助ChatGPT）。</p>
+<h4 id="Instruction-Tuning-Strategies"><a href="#Instruction-Tuning-Strategies" class="headerlink" title="Instruction Tuning Strategies"></a>Instruction Tuning Strategies</h4><p>指令微调策略比预训练更高效，因为这种方法只会使用中等数量的实例（而非全部）进行有监督训练。且前者与后者相比有许多方面不同：比如训练目标，优化时的配置（小的bs，小的学习率）等，除了这些小的方面外还有两个重要的方面：</p>
+<ol>
+<li><strong>Balancing the Data Distribution.</strong> 指令微调中会包含多种任务的数据，因此需要平衡这些任务的比例，最普遍的方法是实例-比例混合策略，做法就是混合所有数据，然后均匀采样。高质量的数据占比越高那么模型的性能通常会越好，但是往往会设置一个上限来防止某个数据集占据绝对的主导地位。</li>
+<li><strong>Combining Instruction Tuning and Pre-Training.</strong> 有两种方法组合这两个过程，第一种方法就是两阶段过程，先预训练，然后指令微调，在这种方法里，可以在指令微调时加入预训练数据，使微调过程更有效稳定；第二种方法是采用一阶段过程，使用多任务学习方法，同时在纯文本的预训练数据和指令格式化微调数据集上进行训练。</li>
+</ol>
+<h4 id="The-Effect-of-Instruction-Tuning"><a href="#The-Effect-of-Instruction-Tuning" class="headerlink" title="The Effect of Instruction Tuning"></a>The Effect of Instruction Tuning</h4><ol>
+<li><strong>Performance Improvement.</strong> 简而言之，指令微调是有效且高效的方法。</li>
+<li><strong>Task Generalization.</strong> 简而言之，指令微调可以让模型具有更好地泛化能力（甚至在跨语言相关任务上也会有提升）。</li>
+</ol>
+<h3 id="Alignment-Tuning"><a href="#Alignment-Tuning" class="headerlink" title="Alignment Tuning"></a>Alignment Tuning</h3><p>在这一部分中，作者介绍了alignment tuning的相关知识，人类反馈数据的收集，以及根据人类反馈进行强化学习的技术。</p>
+<h4 id="Background-and-Criteria-for-Alignment"><a href="#Background-and-Criteria-for-Alignment" class="headerlink" title="Background and Criteria for Alignment"></a>Background and Criteria for Alignment</h4><ol>
+<li><strong>Background.</strong> LLMs的能力十分强大，但是有可能会输出虚假信息，或者有害的、有误导性的、有偏见的回答，这说明LLMs缺乏对人类价值观和偏好的考虑。为了应用于实际生活场景，需要让模型的输出同我们人类的普遍期望具有一致性，即使有研究证明这种alignment会损害模型的能力。</li>
+<li><strong>Alignment Criteria.</strong> 人们设定了各种标准来调节LLMs的行为.<ul>
+<li>helpful标准.</li>
+<li>honestly标准.</li>
+<li>harmless标准.</li>
+</ul>
+</li>
+</ol>
+<h4 id="Collecting-Human-Feedback"><a href="#Collecting-Human-Feedback" class="headerlink" title="Collecting Human Feedback"></a>Collecting Human Feedback</h4><p>这一部分讨论了如何选择一个人类标注团队来进行人类反馈数据的收集。</p>
+<ol>
+<li><strong>Human Labeler Selection.</strong> 当前获得人类反馈数据的最主要的方法就是人类标注，这要求标注人员至少在受教育程度和语言表达上应该令人满意。即使是这样，还存在研究人员期望和标注人员行为不一致的问题，为了解决这个问题InstructGPT专门设计了一个筛选的过程。具体来说，研究人员要首先标记少量的数据，然后评估他们自己的标注和标注人员的标注之间的一致性，一致性最高的标注人员将被选中来进行后续的标注工作。</li>
+<li><strong>Human Feedback Collection.</strong> 当前主要有三种收集反馈和偏好数据的方法。<ul>
+<li><strong>Ranking-based collection</strong>. 早期的工作中，标注人员往往只选择模型最好的输出，但是不同标注人员对“最佳”的选择是有偏差的；此外这样粗粒度的处理方式忽略了其他的输出样本，这是不合适的。因此有了这种方法，对输出的结果进行排序，然后以此排序结果作为指导，引导模型学习应当偏向输出哪些结果而非另一些。</li>
+<li><strong>Question-based collection</strong>. 标注人员通过回答研究人员设计的某些问题来提供更详细的反馈。</li>
+<li><strong>Rule-based collection</strong>. 这种方法是设计一系列规则来测试模型生成的结果是否符合之前提到的诸如有用、诚实、无害等对齐标准。</li>
+</ul>
+</li>
+</ol>
+<h4 id="Reinforcement-Learning-from-Human-Feedback"><a href="#Reinforcement-Learning-from-Human-Feedback" class="headerlink" title="Reinforcement Learning from Human Feedback"></a>Reinforcement Learning from Human Feedback</h4><p>为了让LLMs的输出同人类的价值观对齐，研究人员采用强化学习算法，通过学习奖励模型，让LLMs偏向于生成人类需要的结果。</p>
+<ol>
+<li><p><strong>RLHF System.</strong> RLHF系统由已训练好等待对齐的LLM、从人类反馈中学习的奖励模型、训练LLM的强化学习算法组成。详细来说，就是用预训练模型作为对齐后模型的初始化（例如使用175B的GPT-3作为InstructGPT的初始化），以奖励模型(RM 可以是另一个经过微调的 LM，也可以是根据偏好数据从头开始训练的 LM，如InstructGPT使用的奖励模型就是6B的GPT-3)生成的标量形式的人类对LLM生成文本的偏好程度作为指导，使用强化学习算法（最常用的是PPO算法）对初始化后的参数进行更新。</p>
+</li>
+<li><p><strong>Key Steps for RLHF.</strong> 下图展示了RLHF系统的工作流程。它分为三个步骤：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/32612/workflow.png" alt="workflow"></p>
+<ul>
+<li><strong>Supervised fine-tuning</strong>. 这一步是用额外的文本或者条件对这个 LM 进行微调，例如 OpenAI 对 “更可取” (preferable) 的人工生成文本进行了微调，而 Anthropic 按 “有用、诚实和无害” 的标准在上下文线索上蒸馏了原始的 LM。值得注意的是，这一步是非必须的。</li>
+<li><strong>Reward model training</strong>. 这一步采样一些Instruct或者Prompt，送入上一步的LM中，生成一定量的输出文本，然后由标注人员对这些输出进行排序（直接打分的话人类的主观偏差会导致反馈数据充满噪声），RM的任务就是通过预测这个排名来学习人类的偏好。值得注意的是，目前成功的 RLHF 系统都使用了和生成模型具有 <strong>不同</strong> 大小的 LM，这或许是因为偏好模型和生成模型需要具有类似的能力来理解提供给它们的文本。</li>
+<li><strong>RL fine-tuning</strong>. 这一步的具体操作是将Instruct或者prompt输入初始模型和经过第一步微调之后的模型，分别得到输出文本，然后将微调后模型输出的文本送入RM模型，得到一个标量值作为奖励，然后计算两个模型的生成文本之间的KL散度作为惩罚（这一项被用于惩罚 RL 策略在每个训练批次中的生成大幅偏离初始模型的情况，以确保模型输出合理连贯的文本。如果去掉这一惩罚项可能导致模型在优化中生成乱码文本来愚弄奖励模型以获得高奖励值），最后结合标量奖励和KL惩罚调整模型的参数。</li>
+</ul>
+</li>
+</ol>
+<h2 id="Utilization"><a href="#Utilization" class="headerlink" title="Utilization"></a>Utilization</h2><p>在经过预训练和适应性调整之后，大家会为解决不同的任务而设计恰当的提示策略来利用这些LLMs。在这一部分中，作者分别介绍了In-context learning和Chain-of-thought prompting两种策略，前者以自然语言的形式进行任务描述或者示范，后者可以通过包含一系列中间推理步骤来增强上下文学习。</p>
+<h3 id="In-Context-Learning"><a href="#In-Context-Learning" class="headerlink" title="In-Context Learning"></a>In-Context Learning</h3><p>In-context learning是prompt learning的一种特殊形式。下图是GPT-3论文中的插图，介绍了多任务学习和In-context learning的结合方法。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/32612/In-context_learning.png" alt="In-context_learning"></p>
+<p>下图介绍了In-context learning和Chain-of-thought两种方法。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/32612/ICL_CoT.png" alt="ICL_CoT"></p>
+<h4 id="Prompting-Formulation"><a href="#Prompting-Formulation" class="headerlink" title="Prompting Formulation"></a>Prompting Formulation</h4><p>标准的In-context learning是GPT-3提出的，它使用了格式化的自然语言提示，包括任务描述和几个任务示范，值得注意的是这几个任务示范只是帮助LLMs识别将要执行的任务，而不进行梯度更新。</p>
+<h4 id="Demonstration-Design"><a href="#Demonstration-Design" class="headerlink" title="Demonstration Design"></a>Demonstration Design</h4><p>ICL的有效性受到示范设计的高度影响，而示范设计又包含三个重要的方面：</p>
+<ul>
+<li><strong>Demonstration Selection.</strong> 选择方法包含启发式方法（例如用KNN选择跟查询的语义相关的示范等）和基于LLM的方法（用LLM添加不同示范之后的性能增益来衡量每个示范的信息量等）两种。</li>
+<li><strong>Demonstration Format.</strong> 格式化的结果应当如前图所示。任务描述的优化可以通过在Natural Instructions v2数据集上调优实现，这个数据集是一个由人类编写的任务描述组成的大规模数据集。</li>
+<li><strong>Demonstration Order.</strong> 有研究发现模型倾向于给出演示中靠后的例子的答案，因此演示的顺序也很重要，除了早期的启发式方法外，还可以使用全局和局部熵度量来对不同的演示顺序进行评分。</li>
+</ul>
+<h3 id="Chain-of-Thought-Prompting"><a href="#Chain-of-Thought-Prompting" class="headerlink" title="Chain-of-Thought Prompting"></a>Chain-of-Thought Prompting</h3><p>Chain-of-Thought是一种改进的提示策略，通过添加中间推理步骤来增强模型的推理能力。</p>
+<h4 id="In-context-Learning-with-CoT"><a href="#In-context-Learning-with-CoT" class="headerlink" title="In-context Learning with CoT"></a>In-context Learning with CoT</h4><ul>
+<li><strong>Few-shot CoT.</strong> 将&lt;输入，输出&gt;对变成了&lt;输入，CoT，输出&gt;三元组。以往工作证明了每个问题的多个CoT可以提高性能，以及复杂CoT更能激发LLMs的推理能力，但是它们都依赖于带注释的CoT数据集，因此Auto-CoT使用的Zero-shot-CoT应运而生，它通过提示LLMs来生成CoT。</li>
+<li><strong>Zero-shot CoT.</strong> 不包含人工注释的任务演示。相反，它直接生成推理步骤，然后使用生成的CoT来推导答案，当模型规模超过一定规模时，这种策略可以大大提高性能。</li>
+</ul>
+<h4 id="Further-Discussion-on-CoT"><a href="#Further-Discussion-on-CoT" class="headerlink" title="Further Discussion on CoT"></a>Further Discussion on CoT</h4><ul>
+<li><strong>When CoT works for LLMs?</strong> 模型参数超过100亿才有效，而且只对需要推理的任务提升最明显。</li>
+<li><strong>Why LLMs Can Perform CoT Reasoning?</strong> 人们普遍认为是通过在代码上进行预训练使得模型获得了推理的潜能。</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/32612.html">https://dreamtomb.github.io/posts/32612.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/24819.html" title="LLM 数据处理方法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">LLM 数据处理方法</div></div></a></div><div class="next-post pull-right"><a href="/posts/5555.html" title="Prefix-Tuning_Prompt-Tuning论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Prefix-Tuning_Prompt-Tuning论文笔记</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/20606.html" title="2023-10-10论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-26</div><div class="title">2023-10-10论文笔记</div></div></a></div><div><a href="/posts/17086.html" title="2023-11-21论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-21</div><div class="title">2023-11-21论文笔记</div></div></a></div><div><a href="/posts/35052.html" title="2023-11-7论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-07</div><div class="title">2023-11-7论文笔记</div></div></a></div><div><a href="/posts/62963.html" title="2023-12-05论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-04</div><div class="title">2023-12-05论文笔记</div></div></a></div><div><a href="/posts/63715.html" title="2023-12-19论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-19</div><div class="title">2023-12-19论文笔记</div></div></a></div><div><a href="/posts/63332.html" title="A Survey on In-context Learning"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-24</div><div class="title">A Survey on In-context Learning</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#A-Survey-of-Large-Language-Models%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0"><span class="toc-number">1.</span> <span class="toc-text">A Survey of Large Language Models论文笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Adaptation-Tuning-Of-LLMs"><span class="toc-number">1.1.</span> <span class="toc-text">Adaptation Tuning Of LLMs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Instruction-Tuning"><span class="toc-number">1.1.1.</span> <span class="toc-text">Instruction Tuning</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Formatted-Instance-Construction"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">Formatted Instance Construction</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Instruction-Tuning-Strategies"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">Instruction Tuning Strategies</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#The-Effect-of-Instruction-Tuning"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">The Effect of Instruction Tuning</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Alignment-Tuning"><span class="toc-number">1.1.2.</span> <span class="toc-text">Alignment Tuning</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Background-and-Criteria-for-Alignment"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">Background and Criteria for Alignment</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Collecting-Human-Feedback"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">Collecting Human Feedback</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reinforcement-Learning-from-Human-Feedback"><span class="toc-number">1.1.2.3.</span> <span class="toc-text">Reinforcement Learning from Human Feedback</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Utilization"><span class="toc-number">1.2.</span> <span class="toc-text">Utilization</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#In-Context-Learning"><span class="toc-number">1.2.1.</span> <span class="toc-text">In-Context Learning</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Prompting-Formulation"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">Prompting Formulation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Demonstration-Design"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">Demonstration Design</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Chain-of-Thought-Prompting"><span class="toc-number">1.2.2.</span> <span class="toc-text">Chain-of-Thought Prompting</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#In-context-Learning-with-CoT"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">In-context Learning with CoT</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Further-Discussion-on-CoT"><span class="toc-number">1.2.2.2.</span> <span class="toc-text">Further Discussion on CoT</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

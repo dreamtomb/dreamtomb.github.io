@@ -1,0 +1,253 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Survey of Hallucination in Natural Language Generation | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="背景及定义自然语言生成任务近年来得到了极大的发展，然而幻觉(hallucination)问题是一个很严重的问题。虽然在具体下游任务中的定义略有变化，但总的来说幻觉是指相对于给定的源文本来说生成的内容是无意义的或者不可靠的。它会降低系统性能，在许多实际应用场景下无法满足用户期望。这篇文章是第一篇关于幻觉问题的综述论文，总结了度量指标、缓解方法和未来方向等内容；并对特定下游任务中幻觉的研究进展进行了介">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Survey of Hallucination in Natural Language Generation">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/29533.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="背景及定义自然语言生成任务近年来得到了极大的发展，然而幻觉(hallucination)问题是一个很严重的问题。虽然在具体下游任务中的定义略有变化，但总的来说幻觉是指相对于给定的源文本来说生成的内容是无意义的或者不可靠的。它会降低系统性能，在许多实际应用场景下无法满足用户期望。这篇文章是第一篇关于幻觉问题的综述论文，总结了度量指标、缓解方法和未来方向等内容；并对特定下游任务中幻觉的研究进展进行了介">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-06-19T11:31:41.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:37.132Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/29533.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Survey of Hallucination in Natural Language Generation',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:37'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Survey of Hallucination in Natural Language Generation</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-06-19T11:31:41.000Z" title="发表于 2023-06-19 19:31:41">2023-06-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:37.132Z" title="更新于 2024-03-01 17:36:37">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/LLM/">LLM</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">5.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>16分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Survey of Hallucination in Natural Language Generation"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="背景及定义"><a href="#背景及定义" class="headerlink" title="背景及定义"></a>背景及定义</h1><p>自然语言生成任务近年来得到了极大的发展，然而幻觉(hallucination)问题是一个很严重的问题。虽然在具体下游任务中的定义略有变化，但总的来说幻觉是指相对于给定的源文本来说生成的内容是无意义的或者不可靠的。它会降低系统性能，在许多实际应用场景下无法满足用户期望。这篇文章是第一篇关于幻觉问题的综述论文，总结了度量指标、缓解方法和未来方向等内容；并对特定下游任务中幻觉的研究进展进行了介绍。</p>
+<p>总体来说，幻觉可以被分类为两种：</p>
+<ol>
+<li>内在幻觉(intrinsic hallucination)。这种幻觉现象是指生成的输出与源文本相矛盾。比如给定的文本中包含“A事件发生在2021年”，但是生成内容中包含“A事件发生在2019年”。</li>
+<li>外部幻觉(extrinsic hallucination)。这种幻觉现象是指生成的输出无法被源文本验证(无论是支持还是反驳)。比如生成内容中包含“B事件发生在2019年”，但是源文本中根本没有提到过B事件。</li>
+</ol>
+<h1 id="导致幻觉现象的因素"><a href="#导致幻觉现象的因素" class="headerlink" title="导致幻觉现象的因素"></a>导致幻觉现象的因素</h1><ol>
+<li>数据中的幻觉。导致数据中幻觉的主要因素是source-reference divergence，它可能来自于启发式的数据收集过程，也可能是某些NLG任务本身不可避免的现象。前者可能是收集的数据中本身包含有互相矛盾的文本，也可能是某些文本有大量的重复。后者比如开放式对话系统，需要从聊天风格、谈话内容主题、用户输入、对话历史或提供的知识来源中不一定存在的事实信息来响应，这样能够提高对话的参与度和多样性，但这样的数据集特征不可导致的会产生外在幻觉，引入源信息无法验证的额外信息。</li>
+<li>训练和推理中的幻觉。不够好的表示学习(编码器的学习能力不足，学习不到有效的特征)、错误的解码(解码器如果关注到了encoder错误编码的部分，那么生成的结果就是错误的；而且解码器的策略，例如采用top-k的方式选择输出，k的增大会直接导致幻觉问题的增加)、曝光偏差(训练和推理时解码的不一致，例如训练时解码器基于fact来进行训练，但推理时解码器只能从自己的推理历史中来进一步生成，因此随着生成序列变长，幻觉更严重)、参数知识偏差(模型将知识记在自己的参数中，也会优先考虑从参数中学来的知识，而不是推理中给定的输入)等都会导致幻觉现象的发生。</li>
+</ol>
+<h1 id="衡量幻觉的指标"><a href="#衡量幻觉的指标" class="headerlink" title="衡量幻觉的指标"></a>衡量幻觉的指标</h1><p>很多工作都证明了传统的用于衡量文本质量的指标并不足以评价产生幻觉的程度，因此研究者们提出了许多新的指标。</p>
+<h2 id="静态指标"><a href="#静态指标" class="headerlink" title="静态指标"></a>静态指标</h2><ol>
+<li><p>最简单的方法之一是利用词汇特征(n-grams)来计算生成文本和参考文本之间的信息重叠和矛盾：不匹配的计数越高，可信度越低，因此幻觉分数越高。</p>
+</li>
+<li><p>PARENT(Precision And Recall of Entailed n-grams from the Table)是一种使用源文本和目标文本作为参考来衡量幻觉程度的指标。具体来说，就是先将生成文本和源表格以及目标文本进行对齐，然后计算F1分数，用于反映table-to-text任务的准确性。</p>
+</li>
+<li><p>BVSS(bag of vector sentence similarity)用于测量机器翻译中的句子的好坏，该指标仅涉及目标文本。这个统计度量有助于确定机器翻译模型输出的信息量是否与翻译目标的信息量不同。</p>
+</li>
+</ol>
+<p>虽然静态指标简单有效，但词法匹配的一个固有的限制是它只能处理词法信息。因此，它无法处理句法或语义变化。</p>
+<h2 id="基于模型的指标"><a href="#基于模型的指标" class="headerlink" title="基于模型的指标"></a>基于模型的指标</h2><p>基于模型的度量利用神经网络模型来衡量生成文本中的幻觉程度。它们被用来处理更复杂的句法甚至语义变化。基于模型的度量首先理解源文本和生成文本，并检测知识&#x2F;内容是否匹配。然而，神经网络模型可能会受到错误的影响，这些错误会传播并对幻觉的准确量化产生不利影响。</p>
+<ol>
+<li><p>基于信息提取。通过提取有效信息转换为n元组，规避无关的连词、虚词等简化句式，并对提出来的信息进行相似度的计算，来进行幻觉的评价。但需要指出IE模型本身的效果会影响到幻觉问题的识别。比如gt是“Brad Pitt was born in 1963”，生成文本是“Brad Pitt was born in 1961”，两者提取到的信息为(Brad Pitt,born-in,1963)和(Brad Pitt,born-in,1961)，容易发现日期不匹配，于是认定其为幻觉。</p>
+</li>
+<li><p>基于QA。其基本思想为：如果生成内容和源参考在事实上一致，那么他们针对同一个问题的回答应该是相似的。具体流程如下:首先，给定生成的文本，问题生成(QG)模型生成一组问答对。其次，问答(QA)模型在给定一个gt源文本作为参考的情况下回答生成的问题。最后，根据相应答案的相似性计算幻觉分数。</p>
+</li>
+<li><p>自然语言推断指标。目前用于幻觉检测任务的标记数据集并不多。作为一种替代方法，许多工作利用NLI数据集来处理幻觉。注意，NLI是一个任务，它确定一个“假设”是真、假，还是不确定。基于NLI的指标将幻觉&#x2F;可靠性评分定义为生成文本与源文本互相符合的概率。相比QA和IE，NLI的方法更有鲁棒性。</p>
+</li>
+<li><p>基于Faithfulness分类的指标。这严格来说是一个新的任务数据集，是通过对训练的句子插入幻觉来构造的幻觉数据集，它比NLI数据集更好，因为NLI数据集的符合或中立标签与Faithfulness并不严格等同。比如“普京是美国总统”是符合“普京是总统的”，但是事实上普京并不是美国总统，没有做到faithful。</p>
+</li>
+<li><p>基于语言模型的指标。此方法利用一个在目标域上训练的无条件LM和一个在源域和目标域上训练的有条件LM对比，如果在forced-path decoding过程中无条件的LM计算出的loss小于有条件的LM，那么我们认为这个token和输入是有区别的，即产生了幻觉问题。通过统计token数量就能获得数据集中幻觉的比例。</p>
+<h2 id="人类评价"><a href="#人类评价" class="headerlink" title="人类评价"></a>人类评价</h2></li>
+</ol>
+<p>由于目前为止的幻觉自动评估策略都只能说是差强人意，人类评价仍然是一种常用的方法。通常来说，往往采用分数或者对比两种形式来进行人类评价。</p>
+<h1 id="缓解幻觉现象的方法"><a href="#缓解幻觉现象的方法" class="headerlink" title="缓解幻觉现象的方法"></a>缓解幻觉现象的方法</h1><p>幻觉缓解方法通常可以分为两个大类：数据相关的方法和模型及推理方法。</p>
+<h2 id="数据相关的方法"><a href="#数据相关的方法" class="headerlink" title="数据相关的方法"></a>数据相关的方法</h2><ol>
+<li>建立一个faithful的数据集。考虑到可能是噪声数据导致了幻觉的出现，因此需要构建新的数据集。可以雇佣标注人员从头构建，但可能会影响多样性；也可以遵循短语修饰-去语境-句法修改的步骤来重写已有数据集或网络数据。</li>
+<li>自动清洗数据。对于只有很少的噪声数据需要修改的数据集，可以找到不相干或者矛盾的地方直接进行修改。除此之外还有其他的方法，比如根据已有的幻觉评价标准对现有数据集进行实例级别的评估，再舍弃掉幻觉问题严重的样本。但这个方法有些粗暴，因为实际上产生幻觉问题的可能只是句子中间的部分单词。因此针对这个方法的改进是根据参考成对地训练样本，主要应用在数据文本生成的问题上，因为结构化的数据更容易进行匹配和修正。具体来说就是先用模型解析meaning representation(MR)，然后用从参考中提取出的MR来修正输入的MR。</li>
+<li>信息增强。直接通过外部信息增强输入可以获得更好地表示，例如实体信息、预执行的操作结果、预提取的关系元组等，它们能够显著的提升学习效果，但是不同的信息、数据之间的对齐关系需要额外注意。</li>
+</ol>
+<h2 id="模型和推理方法"><a href="#模型和推理方法" class="headerlink" title="模型和推理方法"></a>模型和推理方法</h2><ol>
+<li>模型架构。现有研究基本从encoder、attention以及decoder三个部分对架构进行改进。<ul>
+<li>编码器学习能力不足会导致幻觉现象的出现，因此一些工作设计了新的dual encoder等组件。</li>
+<li>不同的研究者通过改进注意力机制鼓励生成器更加关注源参考从而缓解答案中的幻觉。</li>
+<li>诸多研究者还设计了众多解码器，这些解码器通过找出tokens之间的隐式差异和依赖关系或者它们所受的显式约束，提高了faithful token出现的可能性，同时减少了hallucination token出现的可能性。由于这种解码器在生成流畅或多样的文本时可能会遇到更多困难，因此需要在它们之间取得平衡。</li>
+</ul>
+</li>
+<li>训练。<ul>
+<li>planning&#x2F;sketching。通过planning或sketching可以约束生成的结果，区别在于planning可以是两步生成器中的一步，用于引入额外的结构或目录信息；sketcing直接就是最终生成结果的一部分了。应用这两种方法也需要平衡faithful和diversity。</li>
+<li>强化学习。强化学习通过设定不同的学习目标来优化模型。尽管由于搜索空间非常大，RL难以学习和收敛，但这种方法可以(至少有潜力)为任务获得最佳策略。</li>
+<li>多任务学习。模型一直学习一个数据集可能会导致幻觉，因此同一个模型去解决多个问题能够让模型学习到任务共同点、摆脱对单一数据的依赖。多任务方法有诸多优点，例如数据效率提高、过拟合减少和快速学习等，在多任务学习中选择应该联合学习哪些任务是至关重要的，同时学习多个任务会带来设计和优化的新挑战。</li>
+<li>可控生成。可控生成方法中把幻觉现象当作一种可控的属性来进行控制。考虑到幻觉不一定是有害的，可能会带来一些好处，可控方法可以通过进一步调整幻觉的程度，来满足不同现实应用的需求。</li>
+</ul>
+</li>
+<li>后处理。后处理方法可以纠正输出中的幻觉，这种独立的任务需要更少的训练数据。特别是对于有大量gt参考遭受幻觉的噪声数据集，建模校正是处理该问题的一个很好的选择。研究者往往遵循生成-修缮的策略来进行后处理。虽然后处理校正步骤可能会生成一些不合语法的文本，但这种方法允许研究人员利用在其他属性（例如流畅性）上表现最好的 SOTA 模型，然后使用少量自动生成的训练数据专门针对faithful这一个指标校正结果。</li>
+</ol>
+<h1 id="未来研究方向"><a href="#未来研究方向" class="headerlink" title="未来研究方向"></a>未来研究方向</h1><ol>
+<li>指标设计<ul>
+<li>设计更细粒度的指标。比如区分开内在幻觉和外部幻觉并分别使用各自的指标进行评价。</li>
+<li>事实检查。比如检查生成的内容是否符合真实世界的知识。</li>
+<li>泛化性。比如需要研究不同格式的数据之间的关系，并设计一个通用的指标。</li>
+<li>结合人类认知。一个好的自动评估指标应该与人类评价相关。</li>
+</ul>
+</li>
+<li>缓解方法<ul>
+<li>设计泛化性和鲁棒性更强的数据预处理方法。</li>
+<li>关注数字方面的幻觉。现在没有针对数字的幻觉解决方法，但数字产生的问题往往会有直接的误导效果。</li>
+<li>关注外部幻觉。大部分方法关注的是内在幻觉，因为有据可循，但外在幻觉更难减少，因此需要能够把两种幻觉区分开来分别设计方法。</li>
+<li>关注长文本幻觉。减少生成长句的自相矛盾问题也是减少幻觉问题的一个子任务。</li>
+<li>关注推理能力。如果生成的文本能够反向推理到源输入那么我们可以认为他是可靠的。在对话领域已经有了一些推理工作，但在减少幻觉方面很少。</li>
+<li>提升可控性。我们需要控制幻觉程度，因为在对话和抽象摘要任务中，幻觉问题不一定全都是负面问题。</li>
+</ul>
+</li>
+</ol>
+<h1 id="对话生成中的幻觉"><a href="#对话生成中的幻觉" class="headerlink" title="对话生成中的幻觉"></a>对话生成中的幻觉</h1><p>Task-oriented dialogue (任务导向对话) 和 open-source dialogue (开放式对话) 是对话系统的两个子类。</p>
+<p>其中前者是一种针对特定任务或目标而设计的对话系统。它的目的是帮助用户完成特定的任务，例如预订酒店、订购食品等。该类型的对话系统通常具有特定的领域知识和操作能力，能够与用户进行有针对性的对话，收集必要的信息并提供准确的响应。Task-oriented dialogue 更注重任务完成的效率和准确性。而后者则是一种更加开放和自由的对话形式。它不依赖于特定任务或领域，并允许用户在对话中自由地探索和表达自己的想法。这种对话系统更加注重与用户之间的交流和互动，而不是特定任务的执行。Open-source dialogue 的目标是提供自然、流畅和富有创造性的对话体验，鼓励用户参与深入的对话和思考。</p>
+<p>总的来说，task-oriented dialogue 侧重于特定任务的执行和效率，而 open-source dialogue 则注重与用户的自由互动和创造性对话。</p>
+<h2 id="开放式对话生成"><a href="#开放式对话生成" class="headerlink" title="开放式对话生成"></a>开放式对话生成</h2><p>开放式中的幻觉主要是“不一致性”，它又可细分为两种：与历史对话相矛盾（self-consistency）以及与外部知识相矛盾（external consistency）。比较常遇到的挑战有两个。</p>
+<p>第一个是Persona consistency问题。在自然语言生成任务中，”persona”通常指的是与生成模型相关的人物角色或特定背景信息。Persona consistency问题是指在多轮对话或连续生成任务中，生成模型难以在生成过程中保持角色一致性、背景信息的延续性和一致性。有研究者构建了专门的PersonaChat数据集，借助NLI方法或者强化学习方法在一定程度上缓解了这个问题。</p>
+<p>第二个是knowledge-grounded dialogue（KGD）任务。它要求在额外的knowledge graph&#x2F;corpus的帮助下生成包含丰富信息的应答。有一些相关工作是利用大语言模型内部的隐式知识来生成富含信息的应答，例如 “Retrieval-Free Knowledge-Grounded Dialogue Response Generation with Adapters” 和 “Think Before You Speak: Using Self-talk to Generate Implicit Commonsense Knowledge for Response Generation”。</p>
+<p>目前该领域缓解幻觉问题的方法大多分为基于数据预处理的和基于模型的。前者值得关注的论文有 “Identifying Untrustworthy Samples: Data Filtering for Open-domain Dialogues with Bayesian Optimization” 和 “Retrieval Augmentation Reduces Hallucination in Conversation”。后者值得关注的论文有”Neural Path Hunter: Reducing Hallucination in Dialogue Systems via Path Grounding“，“Increasing Faithfulness in Knowledge Grounded Dialogue with Controllable Features” 以及 “A Controllable Model of Grounded Response Generation”。</p>
+<h2 id="任务导向对话生成"><a href="#任务导向对话生成" class="headerlink" title="任务导向对话生成"></a>任务导向对话生成</h2><p>任务导向的对话系统通常由以下几个部分组成：</p>
+<ol>
+<li>用户接口(User Interface)：该部分负责与用户进行交互，接收用户的输入信息，如语音或文本，以及向用户展示系统的响应。例如，用户发送消息：“我想预订一间位于城市中心的酒店。”</li>
+<li>自然语言理解(Natural Language Understanding, NLU)：NLU模块将用户的输入转化为机器可理解的语义表示。它负责解析用户的意图、提取关键信息和识别对话中的实体。对于上述示例，NLU可能会提取的信息包括用户的意图是”预订酒店”，关键信息是”位于城市中心”。</li>
+<li>对话管理(Dialogue Management)：对话管理模块是对话系统的核心，负责处理对话流程和决策。它根据用户的意图和系统的状态，确定下一步的操作和响应。在这个例子中，对话管理可能会确定用户的意图是预订酒店，因此需要进一步收集相关信息，如入住日期、离店日期和房间类型。</li>
+<li>知识库(Knowledge Base)：知识库是存储领域相关信息的数据源，包含对话系统需要的各种知识，如实体、属性、关系等。它可以被用来回答用户的查询或提供特定领域的信息。在本例中，知识库包含有关酒店的信息，如酒店名称、位置、价格、房间类型等。</li>
+<li>自然语言生成(Natural Language Generation, NLG)：NLG模块将机器理解的语义表示转化为人类可理解的自然语言表达，以便向用户传达系统的响应。对于上述示例，对话生成可能会生成回复：“请告诉我您的入住日期、离店日期和房间类型，我将帮您预订位于城市中心的酒店。”</li>
+</ol>
+<p>其中DM模块和NLG模块都有可能会产生内在幻觉。</p>
+<p>目前该领域缓解幻觉问题的方法基本都是针对内在幻觉，例如使用树状语义、强化学习算法或是直接构建端到端的系统（“ Constrained Decoding for Neural NLG from Compositional Representations in Task-Oriented Dialogue”，“Slot-consistent NLG for Task-oriented Dialogue Systems with Iterative Rectification Network”，“A Copy-Augmented Sequence-to-Sequence Architecture Gives Good Performance on Task-Oriented Dialogue”），但是针对外部幻觉的研究还未出现。</p>
+<h1 id="QA生成中的幻觉"><a href="#QA生成中的幻觉" class="headerlink" title="QA生成中的幻觉"></a>QA生成中的幻觉</h1><p>生成式问答（Generative question answering，GQA）旨在生成一个抽象的回答。通常，GQA系统涉及在外部知识源中搜索与问题相关的信息。然后，它根据检索到的信息生成答案。在大多数情况下，没有单一的文档包含答案，而是考虑多个检索到的文档来生成答案。这些文档可能包含冗余、补充或相互矛盾的信息。因此，在生成的答案中，幻觉现象很常见。幻觉问题是GQA中最重要的挑战之一。由于GQA系统的一个重要目标是根据问题提供准确的事实答案，答案中的幻觉现象会误导用户，并严重影响系统性能。</p>
+<p>在该领域中还没有对于幻觉的标准定义，不过由于几乎所有GQA相关研究都涉及到人工评估过程，因此可以将其中对生成答案的准确性的评估视为对幻觉的度量；也就是说，答案越准确，包含的幻觉内容越少。</p>
+<h2 id="幻觉缓解"><a href="#幻觉缓解" class="headerlink" title="幻觉缓解"></a>幻觉缓解</h2><p>通常来说，GQA任务中的幻觉可能源自两个方面：1）检索器的能力不足，导致检索到与答案无关的文档；2）条件生成模型本身存在内在和外在的幻觉。通常情况下，这两个部分都有存在，共同导致了答案中幻觉的出现。</p>
+<p>以往的工作中，通常依靠引入额外的可靠的知识源来提升回答的faithfulness，起到了一定的效果，但是这些方法都依赖于高质量的、相关的知识，而这些并不容易获取。</p>
+<p>近来的工作中，研究者们更多的尝试了条件生成模型，比如构建局部指示图或者设计理由增强答案生成器等等，这些方法可以更好地利用原始输入中的信息，但需要额外的工作来构建模型来提取这些信息。</p>
+<p>最新的工作中，有研究者提出了一个新的benchmark，可以用于衡量语言模型在问答任务中的真实性，结果表明，仅仅扩大模型规模不如对其进行微调来提高真实性，因为更大的模型更擅长学习数据的分布，因此往往会产生更多模仿性的虚假答案。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/29533.html">https://dreamtomb.github.io/posts/29533.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/39612.html" title="HaluEval A Large-Scale Hallucination Evaluation Benchmark for Large Language Model"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HaluEval A Large-Scale Hallucination Evaluation Benchmark for Large Language Model</div></div></a></div><div class="next-post pull-right"><a href="/posts/6740.html" title="Constitutional AI Harmlessness from AI Feedback"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Constitutional AI Harmlessness from AI Feedback</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/20606.html" title="2023-10-10论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-26</div><div class="title">2023-10-10论文笔记</div></div></a></div><div><a href="/posts/17086.html" title="2023-11-21论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-21</div><div class="title">2023-11-21论文笔记</div></div></a></div><div><a href="/posts/35052.html" title="2023-11-7论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-07</div><div class="title">2023-11-7论文笔记</div></div></a></div><div><a href="/posts/62963.html" title="2023-12-05论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-04</div><div class="title">2023-12-05论文笔记</div></div></a></div><div><a href="/posts/63715.html" title="2023-12-19论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-19</div><div class="title">2023-12-19论文笔记</div></div></a></div><div><a href="/posts/32612.html" title="A Survey of Large Language Models论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-06</div><div class="title">A Survey of Large Language Models论文笔记</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF%E5%8F%8A%E5%AE%9A%E4%B9%89"><span class="toc-number">1.</span> <span class="toc-text">背景及定义</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%BC%E8%87%B4%E5%B9%BB%E8%A7%89%E7%8E%B0%E8%B1%A1%E7%9A%84%E5%9B%A0%E7%B4%A0"><span class="toc-number">2.</span> <span class="toc-text">导致幻觉现象的因素</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A1%A1%E9%87%8F%E5%B9%BB%E8%A7%89%E7%9A%84%E6%8C%87%E6%A0%87"><span class="toc-number">3.</span> <span class="toc-text">衡量幻觉的指标</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E6%8C%87%E6%A0%87"><span class="toc-number">3.1.</span> <span class="toc-text">静态指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8C%87%E6%A0%87"><span class="toc-number">3.2.</span> <span class="toc-text">基于模型的指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%BA%E7%B1%BB%E8%AF%84%E4%BB%B7"><span class="toc-number">3.3.</span> <span class="toc-text">人类评价</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%93%E8%A7%A3%E5%B9%BB%E8%A7%89%E7%8E%B0%E8%B1%A1%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">缓解幻觉现象的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%9B%B8%E5%85%B3%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">4.1.</span> <span class="toc-text">数据相关的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E5%92%8C%E6%8E%A8%E7%90%86%E6%96%B9%E6%B3%95"><span class="toc-number">4.2.</span> <span class="toc-text">模型和推理方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AA%E6%9D%A5%E7%A0%94%E7%A9%B6%E6%96%B9%E5%90%91"><span class="toc-number">5.</span> <span class="toc-text">未来研究方向</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%B9%E8%AF%9D%E7%94%9F%E6%88%90%E4%B8%AD%E7%9A%84%E5%B9%BB%E8%A7%89"><span class="toc-number">6.</span> <span class="toc-text">对话生成中的幻觉</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E6%94%BE%E5%BC%8F%E5%AF%B9%E8%AF%9D%E7%94%9F%E6%88%90"><span class="toc-number">6.1.</span> <span class="toc-text">开放式对话生成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E5%AF%BC%E5%90%91%E5%AF%B9%E8%AF%9D%E7%94%9F%E6%88%90"><span class="toc-number">6.2.</span> <span class="toc-text">任务导向对话生成</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#QA%E7%94%9F%E6%88%90%E4%B8%AD%E7%9A%84%E5%B9%BB%E8%A7%89"><span class="toc-number">7.</span> <span class="toc-text">QA生成中的幻觉</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%BB%E8%A7%89%E7%BC%93%E8%A7%A3"><span class="toc-number">7.1.</span> <span class="toc-text">幻觉缓解</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

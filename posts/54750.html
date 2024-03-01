@@ -1,0 +1,285 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>RAG and Hallucination | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="RAG、KGD and Hallucination大语言模型的幻觉（Hallucination）指的是模型产生不准确或误导性输出的现象，这种幻觉会导致大模型输出似是而非但实际不正确的答案，或者给出与上下文并不相关的输出。这种幻觉的本质是由于大语言模型本身缺乏对于现实世界的感知能力，其训练数据可能存在偏见的、不完整的、错误的虚假信息，训练中可能存在过拟合或者量化误差，以及Prompt上下文缺失等情况">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RAG and Hallucination">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/54750.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="RAG、KGD and Hallucination大语言模型的幻觉（Hallucination）指的是模型产生不准确或误导性输出的现象，这种幻觉会导致大模型输出似是而非但实际不正确的答案，或者给出与上下文并不相关的输出。这种幻觉的本质是由于大语言模型本身缺乏对于现实世界的感知能力，其训练数据可能存在偏见的、不完整的、错误的虚假信息，训练中可能存在过拟合或者量化误差，以及Prompt上下文缺失等情况">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-09-04T13:20:53.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:37.110Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/54750.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'RAG and Hallucination',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:37'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">RAG and Hallucination</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-09-04T13:20:53.000Z" title="发表于 2023-09-04 21:20:53">2023-09-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:37.110Z" title="更新于 2024-03-01 17:36:37">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/LLM/">LLM</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>24分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="RAG and Hallucination"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="RAG、KGD-and-Hallucination"><a href="#RAG、KGD-and-Hallucination" class="headerlink" title="RAG、KGD and Hallucination"></a>RAG、KGD and Hallucination</h1><p>大语言模型的幻觉（Hallucination）指的是模型产生不准确或误导性输出的现象，这种幻觉会导致大模型输出似是而非但实际不正确的答案，或者给出与上下文并不相关的输出。这种幻觉的本质是由于大语言模型本身缺乏对于现实世界的感知能力，其训练数据可能存在偏见的、不完整的、错误的虚假信息，训练中可能存在过拟合或者量化误差，以及Prompt上下文缺失等情况。在某些关键任务中，幻觉的确可能带来严重的后果和误导。</p>
+<p>当然，幻觉的存在不意味着大模型就无法在生产环境中落地。治理幻觉的方式有很多，包括在训练时提供更高质量的数据，对模型进行Fine-tune补充领域内知识，在RLHF给予Reward Model关于数据真实性更高的倾向性，通过Prompt引导大模型避免对缺乏信息的问题进行生成，以及本文所提到Retrieval Augment Generation，基于向量数据库的召回式生成。合理利用幻觉，可以充分发挥大模型的推理能力和创造能力，解决更加发散性的问题。</p>
+<p>RAG（retrieval-augmented generation）&#x2F;KGD（knowledge-grounded dialogue）有两个重要的组成部分，分别是预训练大模型和领域知识库。前者很好理解，比如 LLaMA2 等预训练大模型就是典型的例子，后者就需要自行构建一个 domin-specific 的 知识库了；结合这两个部分，就可以将 AI 应用的 pretrain-finetune 范式转变为pretrain-prompt范式，大大简化对于不同任务训练模型的工作量，降低了AI的开发和使用门槛，也把搜索结合生成变为了可能。</p>
+<h2 id="RAG的定义"><a href="#RAG的定义" class="headerlink" title="RAG的定义"></a>RAG的定义</h2><p>大多数文本生成可以描述为，给定一个输入文本x，生成一个输出文本y，也就是y&#x3D;f(x)，其中f就是文本生成模型。而基于检索增强的文本生成则可以描述为y&#x3D;f(x, z)，其中z是一系列从训练语料或者外部数据源中检索得到的相关样例z&#x3D;{(xr, yr)}。如果xr跟输入文本x相似或者相关，那么yr也许对答案生成有一定帮助。当xr等于空集时，也就是没有检索得到样例，此时基于检索增强的文本生成就会退化为传统的文本生成。</p>
+<h2 id="为什么要使用RAG"><a href="#为什么要使用RAG" class="headerlink" title="为什么要使用RAG"></a>为什么要使用RAG</h2><ol>
+<li>LLM是有损压缩，不能记住其参数中的所有（长尾）知识。大模型尽管参数量很大，但相比人类的所有知识依然只占九牛一毛，而人类的知识又往往呈现一种长尾分布，那些重要的知识会高频次地出现，让模型能够记住它，但是那些不重要的知识出现频次过低，让大模型很难全部记住。</li>
+<li>LLM的知识很容易过时，很难更新。大模型的训练数据存在时间截止的问题。尽管可以通过Finetune来为大模型加入新的知识，但大模型的的训练成本和时间依然是相当可观的，通常需要大量的计算资源，时间也是天级别更新。不论是向量数据库还是搜索引擎，数据的更新都更加容易，这有助于业务数据的实时性，且模型重新训练的周期被大大拉长了，避免了频繁Finetune带来的数据正确性，政策等风险。</li>
+<li>LLM的输出很难解释和验证。使用LLM生成的结果，很难验证其准确性，存在着大量谬误。通过RAG的方式，所有数据可以记录数据来源，以便于通过人工或者机器的方式校验结果。</li>
+<li>LLMs被证明很容易泄漏私有数据。尽管可以向LLM通过Finetune的方式添加领域知识，但这些领域知识很可能包含个人或者公司的机密信息，且这些数据很可能通过模型在不经意之间泄露出去。通过增加私有数据存储的方式，用户的数据可以更加安全。</li>
+<li>关于数据存储方式。对领域知识的补充往往依赖于特定的数据存储，如向量数据库，搜索引擎或者图数据库。这其中，向量数据库因为具备对高维Embedding的检索能力，跟大模型的结合最为简单，效果也比较出色，目前是RAG中最为常用的数据存储方式。</li>
+</ol>
+<h2 id="RAG检索源"><a href="#RAG检索源" class="headerlink" title="RAG检索源"></a>RAG检索源</h2><p>基于检索增强的文本生成可以引入不同来源的外部知识，也就是可以从不同来源的库中检索召回相关文档。</p>
+<p>a) 训练语料</p>
+<p>大多数研究都聚焦于如何从训练语料中搜索相关的知识，在推理时，利用从训练语料中检索到的高相似度的样例作为额外的参考，从而减少模型生成答案的不确定性。这些工作的主要启发就是不仅可以利用模型参数隐式存储语料中的知识，也可以利用显示的模型可接受形式向模型传输知识，提高生成文本质量。</p>
+<p>b)外部数据</p>
+<p>一部分研究者尝试从外部数据源召回相关样例，在这些研究中，检索池，可以提供额外的不存在于训练语料的信息。这种方式尤其利于领域迁移和知识更新的场景。</p>
+<p>c)无监督数据</p>
+<p>前面两种数据源的局限性在于数据集必须是包括（输入-输出）这样格式的有监督数据，而有些场景下缺乏这样的监督数据，为此也有研究用到这部分无监督数据来增强文本生成，主要想法是去对齐源文本侧的数据跟目标文本侧的数据。</p>
+<h2 id="RAG检索方式"><a href="#RAG检索方式" class="headerlink" title="RAG检索方式"></a>RAG检索方式</h2><p>基于检索增强的文本生成中的检索模块，旨在检索召回跟query相关的文档，为后续的生成模型提供参考。具体方式是给定一个输入文本x和一个检索语料库，检索模型从语料库中检索得到一系列跟x相关的样例z&#x3D;{(xr, yr)}，检索方式可以有以下几种不同方式。</p>
+<p>a) 稀疏向量检索</p>
+<p>如果使用的是有监督的检索语料库，那么{(xr, yr)}是否被召回依赖于x跟xr的相似度。稀疏向量检索利用倒排索引高效匹配关键词，以TFIDF和BM25算法为例。基于稀疏向量检索的方式更倾向于召回有相似表达的文本，停留在字面上的表示，忽略了语义信息。</p>
+<p>b) 稠密向量检索</p>
+<p>为了检索时能召回语义相关的样例，可以利用预语言模型将文本编码成低维稠密向量，然后计算向量之间的内积作为相似度得分，以此作为检索的依据。</p>
+<p>c) 特定任务检索</p>
+<p>前面两种检索当时都是依赖相似度的方法，这种类型的方式是基于一个简单的假设，那就是，如果xr越接近于x，那么yr越有利于帮助文本生成。然而，真实情况下最相似的文本不一定最有利于下游的生成任务。理想情况下，检索的依据应该从从数据中学习，是依赖于特定任务的，好的检索依据是能够提升最后生成模型生成的质量。</p>
+<h2 id="RAG整合方式"><a href="#RAG整合方式" class="headerlink" title="RAG整合方式"></a>RAG整合方式</h2><p>如何将检索得到的文档跟当前输入x整合到一起，从而控制生成模型生成更高质量的结果？</p>
+<p>a) 数据增强</p>
+<p>最直接的整合方式，直接将检索得到的样例{(xr, yr)}跟原始输入x拼接到一起。通过在增强的数据上进行训练，语言模型会隐式地学习到如何整合检索得到的信息。尽管这种方式很简单，但是在诸多任务上都是有效的。</p>
+<p>b) 注意力机制</p>
+<p>通过引入额外的编码器对检索得到文档进行编码，然后利用注意力机制跟原始输入x整合到一起。由于注意力机制逐渐变成诸多NLP任务的关键模块，这种方式也逐渐成为一个默认的方式。</p>
+<p>c) 骨干抽取</p>
+<p>对于前面两种方式，下游生成模型学习如何从检索得到的文档中隐式过滤掉不相关甚至有害的信息，但是也有部分工作尝试通过显示的方式抽取有用信息，进而直接跟输入x整合到一起。</p>
+<h2 id="RAG的关键"><a href="#RAG的关键" class="headerlink" title="RAG的关键"></a>RAG的关键</h2><p>我们在推理时需要从 domin-specific 知识库中抽取出需要的信息，因此对海量数据进行高效率的索引就是RAG的重中之重。</p>
+<p>Retrieval的关键是找到datastore中跟查询最相似的Top-k个元素。至于相似度，面对不同的业务有不同的定义，对于传统搜索来讲相似度往往是类似于TF-IDF这样的基于词频的统计信息；对于向量数据库而言，相似度则是Embedding在高维空间中的距离，这一距离可以是Cosine，L2，IP，也可以是自定义的业务距离。本质上来讲，Embedding也是一种基于训练文本的词频统计，因此其相对于TF-IDF可能会更加精确，这个结论在大部分域内搜索的情况下都是成立的。</p>
+<p>在海量数据中搜索相关数据，肯定少不了对数据的索引能力。传统检索依赖类似于Lucene的倒排索引，而向量检索则依赖Faiss，HNSW，SCaNN这些向量检索库。由于向量检索需要大量算力，在实际落地的过程中往往使用ANN降低算法的复杂度，使用GPU或者SIMD进行算力提升，以及使用分治法将数据拆分成分片进行计算。向量数据库充分利用以上三个能力，这也是大模型时代向量数据库能够爆火的重要原因。</p>
+<h2 id="RAG的未来方向"><a href="#RAG的未来方向" class="headerlink" title="RAG的未来方向"></a>RAG的未来方向</h2><p>尽管当前基于检索增强的文本生成取得一定成功，接下来还有有很长的路去进一步提升整体的效果。</p>
+<p>a) 检索敏感性</p>
+<p>基于检索增强的文本生成对于检索的质量非常敏感。当检索得到的样例跟输入query非常相似时，文本生成模型的效果会很好。但是当检索得到的样例跟输入query没那么相似时，生成的效果会很糟糕甚至不及没有检索增强的生成。</p>
+<p>b) 检索效率</p>
+<p>扩大检索内存可以更大概率获取到跟query相似的内容，但是这也会影响整体推理的效率。如何平衡检索内存大小跟检索效率？</p>
+<p>c) 联合优化</p>
+<p>目前看联合优化检索模块跟生成模型的方式有潜力的，但在实际中，检索模块在训练跟推理阶段仍然存在差距。在训练阶段，误差只传递到局部的少数召回的样例，但是在推理时却要考虑所有在数据库中的样例。</p>
+<p>d) 多模态</p>
+<p>随着技术的发展，跨模态的检索方式也成为了现实，可以直接将不同模态的数据联系到一起，这也需要去探索文本生成任务中检索不同模态数据的可能性。</p>
+<p>e) 多样性跟可控性</p>
+<p>仅使用一种检索依据会导致召回结果缺乏多样性，为此可以通过多种检索方式去获得多样化的结果，从而提升有用信息的含量。不同场景下对于检索的要求不尽相同，未来需要去探索如何使用定制化的方式去进行检索，从而实现更加可控化的文本生成。</p>
+<h2 id="RAG方法"><a href="#RAG方法" class="headerlink" title="RAG方法"></a>RAG方法</h2><h3 id="Retrieval-Augmented-Generation-for-Knowledge-Intensive-NLP-Tasks"><a href="#Retrieval-Augmented-Generation-for-Knowledge-Intensive-NLP-Tasks" class="headerlink" title="Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"></a>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</h3><p>大语言模型已经展示了它们将现实知识存储在它们的参数中的能力，再通过下游任务的微调就可以实现SOTA的效果；然而它们仍不能精确地访问和利用知识，因此在知识密集型任务上的性能表现不尽如人意。除此之外，如何为LLMs的回答提供来源引用以及如何更新LLMs的知识库仍然是悬而未决的难题。因此，作者提出了一种用于检索增强生成（RAG）的通用的微调方法——同时利用参数化记忆以及非参数化记忆来进行生成；其中前者是预训练好的seq2seq模型，后者是通过预训练好的神经检索器访问的稠密向量索引。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/RAG.png" alt="RAG.png"></p>
+<p>如上图所示，RAG 由两部分组成，第一部分负责根据 query $x$检索出 top-k 个匹配的文档$z_i$ ，第二部分将 query $x$和文档拼接起来送入 seq2seq 模型，生成回复$y$。</p>
+<p>在第一部分 Retriver（(Dense Passage Retriever，DPR，$p_\eta(z|x)$） 中，RAG 通过 embedding model 把外部知识和 query 嵌入为稠密向量，做内积得到内积最大的$K$个文档，然后将 query 和文档拼接起来组成$K$个输入，作为第二部分的输入。这一部分采用了 DPR，它是一个双编码器架构，使用BERT-base分别将输入的query和document转换成embedding。</p>
+<p>在第二部分 Generator ($p_\theta(y_i|x,z,y_{1:i-1})$)中，有两种使用文档的方式：第一种是使用同一个文档生成一个完整的序列，先确定一个文档$z_i$，然后再计算$P(y|x,z_i)$；第二种是使用不同的文档生成每个词，对于第$i$个位置，候选词的概率等于所有文档的条件概率之和，即计算候选词对文档的边际概率。总的来说，RAG-Sequence使用单个文档预测所有目标token，而RAG-Token预测每个token都依赖于不同的文档。这一部分采用的是BART模型。</p>
+<h3 id="Leveraging-Passage-Retrieval-with-Generative-Models-for-Open-Domain-Question-Answering"><a href="#Leveraging-Passage-Retrieval-with-Generative-Models-for-Open-Domain-Question-Answering" class="headerlink" title="Leveraging Passage Retrieval with Generative Models for Open Domain Question Answering"></a>Leveraging Passage Retrieval with Generative Models for Open Domain Question Answering</h3><p>FiD（Fusion-in-Decoder）同样包括检索跟生成两个模块，检索模块尝试了不同的方式，一种是稀疏向量检索的BM25（类似于TFiDF，以词为基本单位，同时考虑词频跟逆文本频率的文本相似度方法），其中分词器用的默认参数的SpaCy插件。另一种是稠密向量检索（跟RAG一样使用了DPR），通过两个不同的Bert分别将query和检索库的文档编码成低维向量，利用向量内积计算向量之间的相似度，通过faiss建立索引可以用query检索得到最相似的top-K个文档向量（跟RAG的检索模块相似）。</p>
+<p>生成模块则跟RAG不太一样，FiD将原始的问题，跟检索模块返回的标题跟对应文档通过特殊字符question:，title:，context:拼接到到一起输入到生成模块生成所有检索文档的表征，然后将所有的文表征拼接到一起，利用attention机制进行解码。生成模块的encoder分别对不同检索文档进行编码，这允许模型去容纳庞大数量的检索结果，然后在decoder时汇总所有文档的表征，这允许decoder更好的聚合多个文档的信息。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/FiD.png" alt="FiD.png"></p>
+<h3 id="Joint-retrieval-and-generation-training-for-grounded-text-generation"><a href="#Joint-retrieval-and-generation-training-for-grounded-text-generation" class="headerlink" title="Joint retrieval and generation training for grounded text generation"></a>Joint retrieval and generation training for grounded text generation</h3><p>RetGen的检索模块是基于稠密向量检索，文档跟query分别使用两个不同的编码器。至于生成模块部分，使用了类似GPT-2的结构，利用一个特殊分隔符将文档z跟原始输入x拼接到一起去生成目标序列y。此外，为了帮助模型区别检索返回的文档跟原始输入，在词嵌入层设置了不同的token类型来代表token属于文档或者原始输入。同时，为了最大化地分隔x跟z，在设计position embedding的时候，原始输入 x 的位置id从0开始算起，而文档 z 的位置id则是从400开始算起。</p>
+<p>RetGen也是采用联合训练的方式同时优化检索模块跟生成模块，这里检索模块的文档encoder也会一同更新。由于在训练时每次都去更新检索库中所有文档的向量表示成本巨大，所以RetGen每次只更新检索召回的top-K个文档。对于解码阶段，RetGen采用了MOE（Mixture-of-Expert）的方法，借助K个相同的文本生成模型，将召回的不同文档+相同原始问题x+已经生成的前面的文本序列分别输入这K个模型，然后整合K个模型的预测结果。相比于FID在文档水平上整合信息，RetGen是在token分布水平上整合不同文档的信息。同时，FID需要固定数量的文档作为输入，而RetGen则可以灵活配置检索模块返回的数量。</p>
+<p>除此之外，RetGen在文本生成过程中引入了检索修正，因为目标文本是通过自回归的方式依次生成，在这个生成过程中文档检索的得分也需要不断更新（如果前面生成的目标序列更多的依赖文档z，那么文档z就应该被赋予更高的比重），为此作者在计算公式中乘上检索修正项（在某个文档下生成一个token的概率除以在每一个文档下生成这个token的概率的加权平均），如果修正项大于1，那么文档z就会被分配到更大的概率。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/RetGen.png" alt="RetGen.png"></p>
+<h3 id="Investigating-the-Factual-Knowledge-Boundary-of-Large-Language-Models-with-Retrieval-Augmentation"><a href="#Investigating-the-Factual-Knowledge-Boundary-of-Large-Language-Models-with-Retrieval-Augmentation" class="headerlink" title="Investigating the Factual Knowledge Boundary of Large Language Models with Retrieval Augmentation"></a>Investigating the Factual Knowledge Boundary of Large Language Models with Retrieval Augmentation</h3><p>这篇工作没有提出新的模型或者方法，而是探索了基于检索增强的大模型的知识边界，并且得到了一些有用的结论。</p>
+<p>目前往大模型注入知识的渠道有两种，一种是在训练时加入相应的语料，通过模型权重参数的形式将知识隐式存储下来，另一种就是在推理时将知识写进prompt中，作为模型输入的一部分，显示指导模型的生成。对于知识问答场景而言，很多事实性问题都需要依赖于外部的领域知识才会回答，单靠大模型本身是解决不了的，于是就有研究人员针对检索增强下大模型知识边界的几个相关问题展开了一系列实验。a)大模型的知识边界在哪？大模型到底能否判断问题是否需要引入外部知识或者自身就可以解决。B)检索增强对于大模型的影响在哪？c)不同特性的检索结果对于大模型的影响有何差异？</p>
+<p>研究人员构建了两种不同类型的任务指令，分别叫做QA prompting跟judgemental prompting。QA prompting用于指导语言模型生成对应问题的回复，从而可以去评估模型的问答能力。具体而言就是在指令中要求模型根据问题以及其他信息去生成对应回复，研究人员构造了两种不同的QA prompting指令，分别如下。 a) Normal setting, 要求语言模型利用自身知识直接生成回复，不借助外部知识。b) Retrieval-augmented setting, 要求语言模型利用来自外部的相关文档以及自身知识去生成回复，跟前者的区别在于模型输入多了检索模块返回的相关文档。Judgemental prompting则是用于研究探索模型是否能感知到自身知识边界，具体而言就是让语言模型根据已有信息判断问题是否超出了自身的知识边界，同样根据是否使用了检索结果分为normal setting跟retrieval-augmented setting两种类型的指令。除此之外，研究人员还考虑了两种不同的判断视角的模型指令，分别是：a)Prior judgement，要求模型评估是否有把握回复该问题，具体来说就是在模型还没生成回复前让模型判断是否有能力去回复该问题，是要选择生成回复还是放弃。b) Posteriori judgement，要求模型去评估生成自身生成回复的准确性，具体来说就判断生成结果是否可靠。prompt示例如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">prompt类型</th>
+<th align="center">prompt指令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">QA Prompting&#x2F;Normal Setting</td>
+<td align="center">Answer the following question based on your internal knowledge with one or few words.</td>
+</tr>
+<tr>
+<td align="center">QA Prompting&#x2F;Retrieval-Augmented Setting</td>
+<td align="center">Given the following information: · · · Answer the following question based on the given information or your internal knowledge with one or few words without the source.</td>
+</tr>
+<tr>
+<td align="center">Judgemental Prompting&#x2F;Normal Setting&#x2F;Prior judgement</td>
+<td align="center">Are you sure to accurately answer the following question based on your internal knowledge, if yes, you should give a short answer with one or few words, if no, you should answer ‘Unknown’.</td>
+</tr>
+<tr>
+<td align="center">Judgemental Prompting&#x2F;Normal Setting&#x2F;Posteriori Judgement</td>
+<td align="center">Can you judge if the following answer about the question is correct based on your internal knowledge, if yes, you should answer True or False, if no, you should answer ‘Unknown’.</td>
+</tr>
+</tbody></table>
+<p>研究人员在包括Natural Questions(NQ), TriviaQA, HotpotQA这几个开放域问答数据集上进行相应实验，实验过程涉及了多项指标，具体如下。 Exact match: 模型生成回复跟标准答案完成一致的比例，用于评估语言模型的问答能力。 F1: 模型生成回复跟标准答案重叠的程度，也是用于评估语言模型的问答能力。 Give-up: 语言模型放弃回复的比例，用于评估语言模型生成回复的置信度。 Right&#x2F;G: 语言模型放弃回复中能本来能正确回复的比例。 Right&#x2F;~G: 语言模型选择生成回复中能正确回复的比例。 Eval-Right: 语言模型评估自身回复为正确的比例，换言之就语言模型觉得自己生成了正确回复的比例。Eval-Acc: 语言模型生成回复跟标准答案一致的比例，换言之就是语言模型真正回复正确的比例。</p>
+<p>为了方便获得上述多个指标，研究人员利用一些规则对语言模型的输出进行了解析。同时研究人员也考虑了多种不同类型的检索模块，包括稀疏检索的BM25，稠密检索的RockerQAv2，生成模型chatgpt（让生成模型根据自身记忆生成相应的知识文档），通过前两者召回的文档都具有相同的格式“Passage-{num}: Title:{title} Content:{content}”，而通过生成模型生成的文档的格式则为“Passage-{num}:{content}”。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/KnowledgeEdge.png" alt="KnowledgeEdge.png"></p>
+<p>最终，研究人员得到了以下结论：</p>
+<ol>
+<li><p>大规模语言模型不能准确感知模型自身的知识边界，对于自身回复能力通常会过于盲目自信。总体而言，模型的问答效果（EM，F1）跟模型自身的置信度相关，但是模型对自身能力的置信度往往超出了它真实的水平。如图所示，模型放弃回复的比例（Give-up）并不高，而且回复正确的比例也不高。图中Eval-Right数值远超Eval-Acc也能说明模型对于生成回复会过于盲目自信。这就是大家所诟病的模型幻觉问题，即便不知道答案，也会一本正经的胡说八道，并且模型还会过度自信，没有意识到自己的胡说八道，这跟大家平时使用大模型的感受比较一致。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/table2.png" alt="table2.png"></p>
+</li>
+<li><p>语言模型不能充分利用自身具备的知识，而通过检索增强显示引入外部知识可以弥补该缺陷，而且检索增强可以提升模型对于知识边界的感知能力。在不超过模型输入限制的条件下，随着检索增强召回的文档数增加，整体问答效果随之提升，同时模型也更加自信。如图所示，带有检索增强的问答效果显著优于不带检索增强的，并且，通过检索增强，模型感知的能力跟问答效果一致得到提升，可以看到Right&#x2F;G有明显的下降，Eval-Right跟EM更加一致，同时Eval-Acc有明显提高。这也是蛮符合直观感受，通过检索增强可以在模型生成过程中显示引入外部知识，指导模型生成恰当回复。而增加检索文档数量，有利于提高检索文档的准确率，虽然会引入更多噪声，但只有模型本身有较强的归纳总结能力，那对于整体效果还有帮助的。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/table3.png" alt="table3.png"></p>
+</li>
+<li><p>语言模型的置信度以及对于检索结果的依赖程取决于问题跟检索效果之间的相关性。只有提供高质量的相关文档，才能提升大规模语言模型整体的问答效果以及对于知识边界的感知能力。同时，语言模型会更加依赖于检索的结果，如果提供了低质量的跟问题不相关的文档后，模型就会容易胡说八道，即便在输入指令中让模型先判断检索结果质量后再决定是否使用也不能规避这个问题。也就是，检索结果跟问题越相关，模型就越自信，所以如果检索结果相关但是错误的，就很容易将模型带偏（图中的highly-related, weakly-related是跟问题相关但是没有正确答案文档，可以理解为错误的文档）。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/table4.png" alt="table4.png"></p>
+</li>
+<li><p>基于上述的一些发现，研究人员提出了一种简单的动态检索增强方法，如下图所示，让模型根据检索结果判断是否有能力回复当前问题，如果是的话，就将当前问题，检索结果一同作为模型的输入，引导模型生成，否则就是在模型生成过程中不加入检索结果。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/method.png" alt="method.png"></p>
+</li>
+</ol>
+<h2 id="ANN（Approximate-Nearest-Neighbor）方法"><a href="#ANN（Approximate-Nearest-Neighbor）方法" class="headerlink" title="ANN（Approximate Nearest Neighbor）方法"></a>ANN（Approximate Nearest Neighbor）方法</h2><p>向量数据库需要对数十上百亿的token进行搜索，因此使用暴力法进行搜索显然是不现实的，因此许多向量数据库（例如faiss，milvus等）都会在构建数据库的时候先将这些海量的token进行聚类，然后搜索的时候先找到跟query距离最近的几个聚类中心，然后在这几个类中进行搜索即可，如下图所示。因此，在这一部分，我们会从KNN开始，对ANN的相关算法进行一些了解。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/54750/index.png" alt="index.png"></p>
+<h3 id="KNN算法"><a href="#KNN算法" class="headerlink" title="KNN算法"></a>KNN算法</h3><p>一言以蔽之，KNN算法就是综合k个“邻居”的标签值作为新样本的预测值。该方法有三个要素：距离度量，决策方法以及K值的选择。其中，距离度量有曼哈顿距离，欧氏距离等等；决策方法有投票法，均值法等等；K值的选择有网格搜索等方法，K取值较小时，模型复杂度高，训练误差会减小，泛化能力减弱；K取值较大时，模型复杂度低，训练误差会增大，泛化能力有一定的提高。</p>
+<h4 id="实现方法"><a href="#实现方法" class="headerlink" title="实现方法"></a>实现方法</h4><ul>
+<li>暴力搜索。KNN实现最直接的方法就是暴力搜索（brute-force search），计算输入样本与每一个训练样本的距离，选择前k个最近邻的样本来多数表决。但是，当训练集或特征维度很大时，计算非常耗时，不太可行（对于D维的 N个样本而言，暴力查找方法的复杂度为 O(DN) ） 。</li>
+<li>KD tree。所谓的KD树就是n个特征维度的二叉树，可以对n维空间的样本划分到对应的一个个小空间。KD树建采用的是从m个样本的n维特征中，分别计算n个特征的取值的方差，用方差最大的第k维特征nk来作为根节点。对于这个特征，我们选择特征nk的取值的中位数nkv对应的样本作为划分点，对于所有第k维特征的取值小于nkv的样本，我们划入左子树，对于第k维特征的取值大于等于nkv的样本，我们划入右子树，对于左子树和右子树，我们采用和刚才同样的办法来找方差最大的特征来做更节点，递归的生成KD树。比如我们有二维样本6个，{(2,3)，(5,4)，(9,6)，(4,7)，(8,1)，(7,2)}，构建kd树的具体步骤为： <ol>
+<li>找到划分的特征：6个数据点在x，y维度上的数据方差分别为6.97，5.37，所以在x轴上方差更大，用第1维特征建树。</li>
+<li>确定划分中位数点（7,2）：根据x维上的值将数据排序，6个数据的中值(所谓中值，即中间大小的值)为7，所以划分点的数据是（7,2）。这样，该节点的分割超平面就是通过（7,2）并垂直于：划分点维度的直线x&#x3D;7；</li>
+<li>确定左子空间和右子空间： 分割超平面x&#x3D;7将整个空间分为两部分：x&lt;&#x3D;7的部分为左子空间，包含3个节点&#x3D;{(2,3),(5,4),(4,7)}；另一部分为右子空间，包含2个节点&#x3D;{(9,6)，(8,1)}。</li>
+<li>用同样的办法划分左子树的节点{(2,3),(5,4),(4,7)}和右子树的节点{(9,6)，(8,1)}。最终得到KD树。</li>
+</ol>
+</li>
+</ul>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
+<li>算法简单直观，易于应用于回归及多分类任务。</li>
+<li>对数据没有假设，准确度高，对异常点较不敏感。</li>
+<li>由于KNN方法主要靠周围有限的邻近的样本，而不是靠判别类域的方法来确定所属类别的，因此适用于类域的交叉或非线性可分的样本集。</li>
+</ol>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ol>
+<li>计算量大，尤其是样本量、特征数非常多的时候。另外KD树、球树之类的模型建立也需要大量的内存。</li>
+<li>只与少量的k相邻样本有关，样本不平衡的时候，对稀有类别的预测准确率低。</li>
+<li>使用懒散学习方法，导致预测时速度比起逻辑回归之类的算法慢。当要预测时，就临时进行 计算处理。需要计算待分样本与训练样本库中每一个样本的相似度，才能求得与 其最近的K个样本进行决策。</li>
+<li>与决策树等方法相比，KNN无考虑到不同的特征重要性，各个归一化的特征的影响都是相同的。</li>
+<li>相比决策树、逻辑回归模型，KNN模型可解释性弱一些。</li>
+<li>差异性小，不太适合KNN集成进一步提高性能。</li>
+</ol>
+<h3 id="ANN算法"><a href="#ANN算法" class="headerlink" title="ANN算法"></a>ANN算法</h3><h4 id="HNSW算法"><a href="#HNSW算法" class="headerlink" title="HNSW算法"></a>HNSW算法</h4><h4 id="Annoy算法"><a href="#Annoy算法" class="headerlink" title="Annoy算法"></a>Annoy算法</h4><h4 id="Faiss算法"><a href="#Faiss算法" class="headerlink" title="Faiss算法"></a>Faiss算法</h4><h4 id="ScaNN算法"><a href="#ScaNN算法" class="headerlink" title="ScaNN算法"></a>ScaNN算法</h4></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/54750.html">https://dreamtomb.github.io/posts/54750.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/57928.html" title="Deep Learning Reproducibility"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Deep Learning Reproducibility</div></div></a></div><div class="next-post pull-right"><a href="/posts/33478.html" title="Exchange Ctrl and Caps on Linux"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Exchange Ctrl and Caps on Linux</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/20606.html" title="2023-10-10论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-26</div><div class="title">2023-10-10论文笔记</div></div></a></div><div><a href="/posts/17086.html" title="2023-11-21论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-21</div><div class="title">2023-11-21论文笔记</div></div></a></div><div><a href="/posts/35052.html" title="2023-11-7论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-07</div><div class="title">2023-11-7论文笔记</div></div></a></div><div><a href="/posts/62963.html" title="2023-12-05论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-04</div><div class="title">2023-12-05论文笔记</div></div></a></div><div><a href="/posts/63715.html" title="2023-12-19论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-19</div><div class="title">2023-12-19论文笔记</div></div></a></div><div><a href="/posts/32612.html" title="A Survey of Large Language Models论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-06</div><div class="title">A Survey of Large Language Models论文笔记</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#RAG%E3%80%81KGD-and-Hallucination"><span class="toc-number">1.</span> <span class="toc-text">RAG、KGD and Hallucination</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#RAG%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">1.1.</span> <span class="toc-text">RAG的定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8RAG"><span class="toc-number">1.2.</span> <span class="toc-text">为什么要使用RAG</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RAG%E6%A3%80%E7%B4%A2%E6%BA%90"><span class="toc-number">1.3.</span> <span class="toc-text">RAG检索源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RAG%E6%A3%80%E7%B4%A2%E6%96%B9%E5%BC%8F"><span class="toc-number">1.4.</span> <span class="toc-text">RAG检索方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RAG%E6%95%B4%E5%90%88%E6%96%B9%E5%BC%8F"><span class="toc-number">1.5.</span> <span class="toc-text">RAG整合方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RAG%E7%9A%84%E5%85%B3%E9%94%AE"><span class="toc-number">1.6.</span> <span class="toc-text">RAG的关键</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RAG%E7%9A%84%E6%9C%AA%E6%9D%A5%E6%96%B9%E5%90%91"><span class="toc-number">1.7.</span> <span class="toc-text">RAG的未来方向</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RAG%E6%96%B9%E6%B3%95"><span class="toc-number">1.8.</span> <span class="toc-text">RAG方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Retrieval-Augmented-Generation-for-Knowledge-Intensive-NLP-Tasks"><span class="toc-number">1.8.1.</span> <span class="toc-text">Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Leveraging-Passage-Retrieval-with-Generative-Models-for-Open-Domain-Question-Answering"><span class="toc-number">1.8.2.</span> <span class="toc-text">Leveraging Passage Retrieval with Generative Models for Open Domain Question Answering</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Joint-retrieval-and-generation-training-for-grounded-text-generation"><span class="toc-number">1.8.3.</span> <span class="toc-text">Joint retrieval and generation training for grounded text generation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Investigating-the-Factual-Knowledge-Boundary-of-Large-Language-Models-with-Retrieval-Augmentation"><span class="toc-number">1.8.4.</span> <span class="toc-text">Investigating the Factual Knowledge Boundary of Large Language Models with Retrieval Augmentation</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ANN%EF%BC%88Approximate-Nearest-Neighbor%EF%BC%89%E6%96%B9%E6%B3%95"><span class="toc-number">1.9.</span> <span class="toc-text">ANN（Approximate Nearest Neighbor）方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#KNN%E7%AE%97%E6%B3%95"><span class="toc-number">1.9.1.</span> <span class="toc-text">KNN算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="toc-number">1.9.1.1.</span> <span class="toc-text">实现方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E7%82%B9"><span class="toc-number">1.9.1.2.</span> <span class="toc-text">优点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9"><span class="toc-number">1.9.1.3.</span> <span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ANN%E7%AE%97%E6%B3%95"><span class="toc-number">1.9.2.</span> <span class="toc-text">ANN算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HNSW%E7%AE%97%E6%B3%95"><span class="toc-number">1.9.2.1.</span> <span class="toc-text">HNSW算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Annoy%E7%AE%97%E6%B3%95"><span class="toc-number">1.9.2.2.</span> <span class="toc-text">Annoy算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Faiss%E7%AE%97%E6%B3%95"><span class="toc-number">1.9.2.3.</span> <span class="toc-text">Faiss算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ScaNN%E7%AE%97%E6%B3%95"><span class="toc-number">1.9.2.4.</span> <span class="toc-text">ScaNN算法</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Milvus_LangChain | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="MilvusMilvus 是一个用于向量（Vector）存储和检索的特殊数据库，由国内的创业公司 Zilliz 开发。 所谓向量，可以看作一个长度为 N 的元组。很多 AI&#x2F;ML 系统（例如推荐系统、图片相似度检测等）都有类似的需求：这些系统首先将海量数据集经过特征提取得到很多向量，使用时给定一个向量，从数据集向量中快速检索出和它最“相似”的 K 个向量。相似度的定义有多种，最常见的有余">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Milvus_LangChain">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/28126.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="MilvusMilvus 是一个用于向量（Vector）存储和检索的特殊数据库，由国内的创业公司 Zilliz 开发。 所谓向量，可以看作一个长度为 N 的元组。很多 AI&#x2F;ML 系统（例如推荐系统、图片相似度检测等）都有类似的需求：这些系统首先将海量数据集经过特征提取得到很多向量，使用时给定一个向量，从数据集向量中快速检索出和它最“相似”的 K 个向量。相似度的定义有多种，最常见的有余">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-07-11T00:09:37.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:37.080Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/28126.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Milvus_LangChain',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:37'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Milvus_LangChain</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-07-11T00:09:37.000Z" title="发表于 2023-07-11 08:09:37">2023-07-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:37.080Z" title="更新于 2024-03-01 17:36:37">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/LLM/">LLM</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Milvus_LangChain"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Milvus"><a href="#Milvus" class="headerlink" title="Milvus"></a>Milvus</h1><p>Milvus 是一个用于向量（Vector）存储和检索的特殊数据库，由国内的创业公司 Zilliz 开发。</p>
+<p>所谓向量，可以看作一个长度为 N 的元组。很多 AI&#x2F;ML 系统（例如推荐系统、图片相似度检测等）都有类似的需求：<strong>这些系统首先将海量数据集经过特征提取得到很多向量，使用时给定一个向量，从数据集向量中快速检索出和它最“相似”的 K 个向量</strong>。相似度的定义有多种，最常见的有余弦距离、欧几里得距离等。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/28126/sim_sear.png" alt="sim_sear"></p>
+<p>为了做到这一点，最容易想到的方法就是让给定向量和所有数据库中的向量依次做比较，但显然这个做法太慢了。RDBMS 中有索引的概念，那我们能不能为向量的相似度也建立索引呢？当然是可以的！</p>
+<p>这个问题称为<strong>向量相似度检索</strong>（vector similarity search），Facebook 开源的 <a target="_blank" rel="noopener" href="https://github.com/facebookresearch/faiss">Faiss</a> 就是这样一个 C++ library，它内置了多种索引，例如 IVF_FLAT、IVF_FQ8、IVF_PQ 等（这些算法不是本文的重点）。Milvus 基于 Faiss 开发，Milvus 添加了存储组件，使之成为一个完整的数据库产品（而不仅是个 libaray），同时也做了很多工程上的优化。</p>
+<h2 id="存储格式"><a href="#存储格式" class="headerlink" title="存储格式"></a>存储格式</h2><p>Milvus 的数据模型允许每行数据（文中称为 entity）包含 1 个或多个 vector 以及可选的<strong>数值属性</strong>（numeric attribute）。其中数值属性一般起到过滤作用，比如年龄、身高之类的，可以作为查询过滤条件的一部分。</p>
+<p>每个 vector 本身显然是要连续排列的（vector 一定是以整体参与运算），而 vector 之间按列排列。比如一张表有 v1、v2 两个 vector 列、{A,B,C} 三行数据，那么在存储上的排列就是 {A.v1, B.v1, C.v1, A.v2, B.v2, C.v2} 。</p>
+<h2 id="索引选择"><a href="#索引选择" class="headerlink" title="索引选择"></a>索引选择</h2><p>索引的原理超出本文的范畴，这里只介绍最基本的 idea：在构建索引时，会通过聚类算法选出几个中心点（v0<del>v9 聚类得到图中 c0</del>c2 三个中心点），当给定查询 q 时，算法能快速找到离 q 最近的 k 个中心点（k&#x3D;2，得到 c0、c1），之后只要从 c0、c1 的邻居中（v0~v6）搜索即可。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/28126/index.png" alt="index"></p>
+<p>索引选择的实现是基于代价的：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/28126/strategy.png" alt="strategy"></p>
+<p><strong>策略A</strong>（vector不走索引，数值条件走索引）：先通过数值属性的倒排索引过滤，再在过滤出来的所有数据上扫描（逐个计算相似度，不依靠vector的索引）</p>
+<p><strong>策略B</strong>（vector走索引，数值条件走索引）：通过数值属性的倒排索引拿到过滤结果 bitmap，然后在 vector 上利用相似度索引得所有相似的向量，根据 bitmap 只留下复合过滤条件的那些，再取 TopK</p>
+<p><strong>策略C</strong>（vector走索引，数值条件不走索引）：在 vector 上利用相似度索引得所有相似的向量，然后按数值条件过滤</p>
+<p><strong>策略D</strong>：基于代价在 A&#x2F;B&#x2F;C 中选择一个，至于怎么选应该很容易想到吧 :)</p>
+<p><strong>策略E</strong>：是对 D 的进一步改进，也是 Milvus 使用的策略。具体来说，Milvus 首先根据某个数值属性将整个 dataset 分区（比如 price 可以分为 [1, 100], [101, 200], [201, 300], [301, 400] ），之后，如果查询条件带有分区键，则可以进行“分区裁剪”（比如对于 price in [50, 250]，可以直接裁剪出 [1, 100], [101, 200], [201, 300] 这三个分区），并且对每个分区采取 cost-based 策略（比如中间的 [101, 200] 区间不需要对 price 进行过滤，因为一定满足条件）</p>
+<h1 id="LangChain"><a href="#LangChain" class="headerlink" title="LangChain"></a>LangChain</h1><p>整体分为：基础层、能力层、应用层三部分。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/28126/LangChain.png" alt="LangChain"></p>
+<h2 id="基础层"><a href="#基础层" class="headerlink" title="基础层"></a>基础层</h2><p>包括：Models、LLM、Index三层：</p>
+<h3 id="Models层"><a href="#Models层" class="headerlink" title="Models层"></a>Models层</h3><p>可以看出各家大模型的演进历史，其中Google、OpenAI、Meta、DeepMind领先优势非常大，国内大厂唯独腾讯缺席。有几个点：</p>
+<p>目前最主要的几个大模型为： Google的Bard、Meta的LLaMa、OpenAI的GPT-4、DeepMind的Chinchilla</p>
+<p>另外目前投入应用的智能终端基本都是基于模型的Fine-Tuning或者RLHF技术，并且需要大量的相关行业训练集，典型比如code领域、财经领域BloombergGPT、学术论文编写等，例如在Code细分领域，目前的模型有：OpenAI的Codex、DeepMind的AlphaCode以及Saleforce的CodeGen。</p>
+<p>Models层的输出包括：</p>
+<ul>
+<li>文本自动生成</li>
+<li>embeding向量化输出</li>
+<li>多模态输出</li>
+</ul>
+<h3 id="LLMS层"><a href="#LLMS层" class="headerlink" title="LLMS层"></a>LLMS层</h3><p>这一层主要强调对models层能力的封装以及服务化输出能力，主要有：</p>
+<ul>
+<li>各类LLM模型管理平台：强调的模型的种类丰富度以及易用性</li>
+<li>一体化服务能力产品：强调开箱即用</li>
+<li>差异化能力：比如聚焦于Promp管理、基于共享资源的模型运行模式等等</li>
+</ul>
+<h3 id="Index层"><a href="#Index层" class="headerlink" title="Index层"></a>Index层</h3><p>对用户私域文本、图片、PDF等各类文档进行存储和检索，这里有两个方案：</p>
+<ul>
+<li>Vector方案：即对文件先切分为Chunks，在按Chunks分别编码存储并检索</li>
+<li>KG方案：这部分利用LLM抽取文件中的三元组，将其存储为KG供后续检索</li>
+</ul>
+<h2 id="能力层"><a href="#能力层" class="headerlink" title="能力层"></a>能力层</h2><p>如果基础层提供了最核心的能力，能力层则给这些能力安装上手、脚、脑，让其具有记忆和触发万物的能力，包括：Chains、Memory、Tool三部分</p>
+<h3 id="Chains层"><a href="#Chains层" class="headerlink" title="Chains层"></a>Chains层</h3><p>按照<em><strong>不同的需求抽象并定制化不同的执行逻辑</strong></em>，Chain可以相互嵌套并串行执行，通过这一层，让LLM的能力链接到各行各业比如面向私域数据的load_qa_with_sources_chain; 比如面向SQL数据源的SQLDatabaseChain；再比如能自动生成代码并执行的LLMMathChain等等。</p>
+<h3 id="Memory层"><a href="#Memory层" class="headerlink" title="Memory层"></a>Memory层</h3><p>这层主要有两个核心点：</p>
+<ul>
+<li>对Chains的执行过程中的输入、输出进行记忆并结构化存储，为下一步的交互提供上下文，这部分简单存储在Redis即可</li>
+<li>根据交互历史构建知识图谱，根据关联信息给出准确结果</li>
+</ul>
+<h3 id="Tools层"><a href="#Tools层" class="headerlink" title="Tools层"></a>Tools层</h3><p>其实Chains层可以根据LLM + Prompt执行一些特定的逻辑，但是如果要用Chain实现所有的逻辑不现实，可以通过Tools层也可以实现，Tools层理解为技能比较合理。典型的比如搜索、维基百科、天气预报、chatGPT服务等等。</p>
+<h2 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h2><p>有了基础层和能力层，我们可以构建各种各样好玩的，有价值的服务，这里就是Agent</p>
+<h3 id="Agent层"><a href="#Agent层" class="headerlink" title="Agent层"></a>Agent层</h3><p>Agent层可以根据Tool和Chain组合出特定的服务来，最终实现以更自然的文本交互形态完成用户特定需求的目标，比如用自然语言的方式实现sql的操作等等。</p>
+<h1 id="项目架构"><a href="#项目架构" class="headerlink" title="项目架构"></a>项目架构</h1><h2 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h2><p>1、将垂直行业的领域知识向量化并存入向量数据库</p>
+<p>2、用户提问</p>
+<p>3、用户问题向量化</p>
+<p>4、查询向量数据库，得到TopN条匹配知识</p>
+<p>5、构建Prompt，调用OpenAI API或其他大语言模型</p>
+<p>6、返回回答</p>
+<h2 id="架构说明"><a href="#架构说明" class="headerlink" title="架构说明"></a>架构说明</h2><p><strong>1、Embeddgings model选择</strong></p>
+<p>要将领域知识向量化，需要有Embeddings model，最简单的方案是使用OpenAI的Embeddings API。</p>
+<p>由于OpenAI的Embeddings model是通用模型，对垂直行业并不是最适合的，会出现回答不准确的情况。如果数据量较大，需要反复调用Embeddgins API，效率较低、成本较高。</p>
+<p>可以考虑自己基于知识库自训练或基于一些现成的模型，HuggingFace上有很多Embeddings model可供参考使用。</p>
+<p><strong>2、向量数据库选择</strong></p>
+<p>向量数据库在相似文本搜索、个性化推荐、相似图片搜索等都有很好的应用场景。开源的向量数据库有qdrant，weaviate，milvus，elasticsearch等，看起来qdrant的性能最好。</p>
+<p>qdrant对常用的向量数据库的测试报告：<a href="https://link.zhihu.com/?target=https://qdrant.tech/benchmarks/">https://qdrant.tech/benchmarks/</a></p>
+<p><strong>3、LLM框架</strong></p>
+<p>LangChain及LlamaIndex (原<em>GPT Index</em>) 这样的LLM框架，封装了很多LLM的工具，可以极大程度提升与LLM的集成效率。</p>
+<p>LlamaIndex (原GPT Index) 入门门槛更低，入门文档也写得比较详尽。LangChain更为强大灵活，qdrant对LangChain的集成更好。</p>
+<p>可以参考 <a href="https://link.zhihu.com/?target=https://news.ycombinator.com/item?id=34568343">https://news.ycombinator.com/item?id=34568343</a></p>
+<p><strong>4、调用OpenAI，构建的Prompt模板</strong></p>
+<p>Answer the question as truthfully the question as truthfully as possible using the provided text, and if the answer is not contained within the text below, say “I don’t know”</p>
+<p>Context:<br>向量数据库科搜索结果的TopN 知识的拼接</p>
+<p>Q: 用户提问</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/28126/architecture.png" alt="architecture.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/28126.html">https://dreamtomb.github.io/posts/28126.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/50073.html" title="LangChain-ChatGLM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">LangChain-ChatGLM</div></div></a></div><div class="next-post pull-right"><a href="/posts/21662.html" title="SelfCheckGPT_Neural Path Hunter"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">SelfCheckGPT_Neural Path Hunter</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/20606.html" title="2023-10-10论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-26</div><div class="title">2023-10-10论文笔记</div></div></a></div><div><a href="/posts/17086.html" title="2023-11-21论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-21</div><div class="title">2023-11-21论文笔记</div></div></a></div><div><a href="/posts/35052.html" title="2023-11-7论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-07</div><div class="title">2023-11-7论文笔记</div></div></a></div><div><a href="/posts/62963.html" title="2023-12-05论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-04</div><div class="title">2023-12-05论文笔记</div></div></a></div><div><a href="/posts/63715.html" title="2023-12-19论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-19</div><div class="title">2023-12-19论文笔记</div></div></a></div><div><a href="/posts/32612.html" title="A Survey of Large Language Models论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-06</div><div class="title">A Survey of Large Language Models论文笔记</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Milvus"><span class="toc-number">1.</span> <span class="toc-text">Milvus</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E6%A0%BC%E5%BC%8F"><span class="toc-number">1.1.</span> <span class="toc-text">存储格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9"><span class="toc-number">1.2.</span> <span class="toc-text">索引选择</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LangChain"><span class="toc-number">2.</span> <span class="toc-text">LangChain</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E5%B1%82"><span class="toc-number">2.1.</span> <span class="toc-text">基础层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Models%E5%B1%82"><span class="toc-number">2.1.1.</span> <span class="toc-text">Models层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LLMS%E5%B1%82"><span class="toc-number">2.1.2.</span> <span class="toc-text">LLMS层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Index%E5%B1%82"><span class="toc-number">2.1.3.</span> <span class="toc-text">Index层</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%BD%E5%8A%9B%E5%B1%82"><span class="toc-number">2.2.</span> <span class="toc-text">能力层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Chains%E5%B1%82"><span class="toc-number">2.2.1.</span> <span class="toc-text">Chains层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Memory%E5%B1%82"><span class="toc-number">2.2.2.</span> <span class="toc-text">Memory层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tools%E5%B1%82"><span class="toc-number">2.2.3.</span> <span class="toc-text">Tools层</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%B1%82"><span class="toc-number">2.3.</span> <span class="toc-text">应用层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Agent%E5%B1%82"><span class="toc-number">2.3.1.</span> <span class="toc-text">Agent层</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84"><span class="toc-number">3.</span> <span class="toc-text">项目架构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="toc-number">3.1.</span> <span class="toc-text">整体流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E"><span class="toc-number">3.2.</span> <span class="toc-text">架构说明</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

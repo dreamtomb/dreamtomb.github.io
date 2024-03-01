@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>A Primer on the Signature Method in Machine Learning | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="A Primer on the Signature Method in Machine LearningPath Signature的基础知识1、pathpath被定义为一个将连续取值区间[a,b]转换到多维空间$R^d$的映射。其最简单的理解就是物体运动的轨迹，假定物体在二维平面上从$t_1$时刻持续运动到$t_2$时刻，每个时刻的位置都可以用一个二维向量表示，这一轨迹就构成了一条path，$X">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Primer on the Signature Method in Machine Learning">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/2710.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="A Primer on the Signature Method in Machine LearningPath Signature的基础知识1、pathpath被定义为一个将连续取值区间[a,b]转换到多维空间$R^d$的映射。其最简单的理解就是物体运动的轨迹，假定物体在二维平面上从$t_1$时刻持续运动到$t_2$时刻，每个时刻的位置都可以用一个二维向量表示，这一轨迹就构成了一条path，$X">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2022-08-16T12:09:58.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:36.988Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="Path Signature">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/2710.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'A Primer on the Signature Method in Machine Learning',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:36'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">A Primer on the Signature Method in Machine Learning</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-08-16T12:09:58.000Z" title="发表于 2022-08-16 20:09:58">2022-08-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:36.988Z" title="更新于 2024-03-01 17:36:36">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Path-Signature/">Path Signature</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="A Primer on the Signature Method in Machine Learning"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="A-Primer-on-the-Signature-Method-in-Machine-Learning"><a href="#A-Primer-on-the-Signature-Method-in-Machine-Learning" class="headerlink" title="A Primer on the Signature Method in Machine Learning"></a>A Primer on the Signature Method in Machine Learning</h1><h2 id="Path-Signature的基础知识"><a href="#Path-Signature的基础知识" class="headerlink" title="Path Signature的基础知识"></a>Path Signature的基础知识</h2><h3 id="1、path"><a href="#1、path" class="headerlink" title="1、path"></a>1、path</h3><p>path被定义为一个将连续取值区间[a,b]转换到多维空间$R^d$的映射。其最简单的理解就是物体运动的轨迹，假定物体在二维平面上从$t_1$时刻持续运动到$t_2$时刻，每个时刻的位置都可以用一个二维向量表示，这一轨迹就构成了一条path，$X:[t_1,t_2]\to R^2，X_t&#x3D;{X_t^1,X_t^2}$，它的每个维度都表示了物体在对应方向上随时间变化的规律；更一般的path可以被定义为：$X:[a,b]\to R^d，X_t&#x3D;{X_t^1,X_t^2,\cdots,X_t^d},$在实际应用中，我们能够获得的path通常并不是连续的，而是它在取值区间内的不均匀采样，因此我们通常需要进行不同的插值以获得时间上分布均匀且更加密集的path。</p>
+<h3 id="2、path-integral"><a href="#2、path-integral" class="headerlink" title="2、path integral"></a>2、path integral</h3><p>path signature实际上是path的不同阶路径积分（path integral）的集合，我们首先来介绍路径积分。假定存在两个一维path：$X_t,Y_t$，且记$X_t^{‘}&#x3D;\mathrm{d}X_t&#x2F;\mathrm{d}_t$，则我们定义路径积分为：$\int_a^bY_tX_t^{‘}\mathrm{d}t&#x3D;\int_a^bY_t\mathrm{d}X_t$，其意义就是在参变量由a变换至b时$Y_t$对$X_t$的积分，这一形式的路径积分是后续所有阶路径积分的基础。</p>
+<p>path signature有两个重要的性质：</p>
+<ul>
+<li><p>平移不变性。我们对路径X进行平移之后，并不会对路径积分产生任何的影响，数学描述如下：<br>$$<br>\int_a^bY_t\mathrm{d}X_t&#x3D;\int_a^bY_t\mathrm{d}Z_t,Z_t&#x3D;X_t+c<br>$$</p>
+</li>
+<li><p>重参数不变性。路径积分的结果只和$X_t,Y_t$的相对关系有关，与参变量t无关。<br>$$<br>\int_a^bY_t\mathrm{d}X_t&#x3D;\int_{k_1a}^{k_2b}Y_r\mathrm{d}X_r<br>$$<br>其中<br>$$<br>Y_t(X_t)&#x3D;Y_r(X_r),X_t(a)&#x3D;X_r(k_1a),X_t(b)&#x3D;X_r(k_2b)<br>$$</p>
+</li>
+</ul>
+<p>对于一条多维path：$X:[a,b]\to R^d$，首先我们给出其<strong>一阶path integral</strong>的表达式为：<br>$$<br>S(X)^n_{a,t}&#x3D;\int_a^t\mathrm{d}X_c^n,t\in[a,b]<br>$$<br>其中 $Y_t&#x3D;1,X_t&#x3D;X_c^n,X_c^n$ 表示路径X的第n个维度在c时刻的取值。对于一个d维的path，其一阶path signature有d个。由于一阶path signature的积分上限是变化的t，而非定值b，所以实际上$S(X) _ {a,t}^n$也是一个一维path:$X^{‘}:[a,b]\to R^d,X_t^{‘}&#x3D;{S(X) _ {a,t}^n}$，因此我们可以对它再次求取路径积分得到了<strong>二阶path integral</strong>：<br>$$<br>S(X) _ {a,t}^{n,m}&#x3D;\int_a^tS(X) _ {a,c}^n\mathrm{d}X_c^m&#x3D;\int_a^t\int_a^c\mathrm{d}X_s^n\mathrm{d}X_c^m<br>$$<br>显然，二阶PS特征有 $d^2$ 个。以此类推，我们可以得到<strong>k阶path integral</strong>：<br>$$<br>S(X) _ {a,t}^{i_1,\cdots,i_k}&#x3D;\int_{a&lt;t_k&lt;t}\cdots\int_{a&lt;t_1&lt;t_2}\mathrm{d}X_{t_1}^{i_1}\cdots\mathrm{d}X_{t_k}^{i_k}<br>$$</p>
+<h3 id="3、path-signature"><a href="#3、path-signature" class="headerlink" title="3、path signature"></a>3、path signature</h3><p>总的来说path signature（路径签名）是一种从数据中提取属性特征的非参数方法，它捕获了路径的许多重要的解析和几何属性。这种方法通常首先使用多种嵌入算法将数据转化成多维路径，然后去计算总结了数据中包含信息的签名的单个项。因此，一句话进行总结：<strong>签名方法就是将原始数据转换为一组用于机器学习任务的特征的方法</strong>。</p>
+<p>一条路径X的签名，被记为$S(X) _ {a,b}$，是路径X的所有阶路径积分的集合，它被定义为：<br>$$<br>Sig(X) _ {a,b}&#x3D;(1,S(X) _ {a,b}^1,\cdots,S(X) _ {a,b}^d,S(X) _ {a,b}^{1,1},\cdots,S(X) _ {a,b}^{d,d},\cdots)<br>$$<br><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/2710/path_integral_exercises.png" alt="path_integral_exercises"></p>
+<h3 id="4、path-signature的动机——Picard-迭代"><a href="#4、path-signature的动机——Picard-迭代" class="headerlink" title="4、path signature的动机——Picard 迭代"></a>4、path signature的动机——Picard 迭代</h3><p>签名方法自然诞生于常微分方程领域，其基石是Picard方法。对于一个一阶常微分方程：<br>$$<br>\frac{dy}{dx}&#x3D;f(x,y), y(x_0)&#x3D;y_0<br>$$<br>Picard方法允许我们用迭代级数的方式来构造该方程的近似解，该方程的积分形式变为：<br>$$<br>y(x)&#x3D;y(x_0)+\int_{x_0}^xf(t,y(t))dt<br>$$<br>如果我们定义一系列的函数$y_k(x)$，其中第一项是常数函数$y_0(x)&#x3D;y(x_0)$，那么我们可以归纳地定义<br>$$<br>y_k(x)&#x3D;y(x_0)+\int_{x_0}^{x}f(t,y_{k-1}(t))dt<br>$$<br>Picard定理表明，在适当的条件下，该微分方程的解由$y(x)&#x3D;\lim_{k\to\infty}y_k(x)$给出。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/2710/Picard_method.png" alt="Picard_method"></p>
+<p>更一般的，对于$Y_t&#x3D;y+\int_a^tV(Y_s)dX_s$，可以将整个Picard迭代写为如下过程：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/2710/Picard.png" alt="Picard"></p>
+<p>容易发现上图中的式子中包含了我们之前提到的多阶路径积分，这便促使Terry Lyons提出了路径签名，签名中包含了所有的高阶路径积分，可以用于计算微分方程的近似解。</p>
+<h3 id="5、signature的重要属性"><a href="#5、signature的重要属性" class="headerlink" title="5、signature的重要属性"></a>5、signature的重要属性</h3><ul>
+<li><p>唯一性：任意一个非树状路径均可被其PS唯一确定。</p>
+</li>
+<li><p>平移不变性、旋转不变性：PS与路径的起始位置点无关；某些阶的PS及其组合具有旋转不变性。</p>
+</li>
+<li><p>在时间重参数化下的不变性、在不同时间跨度下的不变性：对采样率、丢失采样点、添加随机噪声等不太敏感。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/2710/reparametrisations_invariance.png" alt="reparametrisations_invariance"></p>
+</li>
+<li><p>洗牌乘积等效性：使用PS作为特征时，签名中两个低阶项的乘积可以用高阶项的线性组合等效表示，即两个路径积分$S(X) _ {a,b}^{i_1,\cdots,i_k}$和$S(X) _ {a,b}^{j_1,\cdots,j_m}$的乘积可以被路径签名$S(X) _ {a,b}$的高阶项的某个集合之和表示。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/2710/shuffle_product.png" alt="shuffle_product"></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/2710/shuffle_example.png" alt="shuffle_example"></p>
+<p>证明（以式子1为例）：<br>$$<br>\begin{aligned}<br>左式&amp;&#x3D;S(X) _ {a,b}^1S(X) _ {a,b}^2\\&amp;&#x3D;\int_a^bdX_t^1\int_a^bdX_t^2\\&amp;&#x3D;(X_b^1-X_a^1)(X_b^2-X_a^2)\\&amp;&#x3D;X_b^1X_b^2+X_a^1X_a^2-X_a^1X_b^2-X_b^1X_a^2<br>\end{aligned}<br>$$</p>
+<p>$$<br>\begin{aligned}<br>右式&amp;&#x3D;S(X) _ {a,b}^{1,2}+S(X) _ {a,b}^{2,1}\\&amp;&#x3D;\int_a^b\int_a^{t_2}dX_{t_1}^1dX_{t_2}^2+\int_a^b\int_a^{t_2}dX_{t_1}^2dX_{t_2}^1\\&amp;&#x3D;\int_a^b(X_{t_2}^1-X_a^1)dX_{t_2}^2+\int_a^b(X_{t_2}^2-X_a^2)dX_{t_2}^1\\&amp;&#x3D;\int_a^bX_{t_2}^1dX_{t_2}^2+\int_a^bX_{t_2}^2dX_{t_2}^1-X_a^1(X_b^2-X_a^2)-X_a^2(X_b^1-X_a^1)\\&amp;&#x3D;X_t^1X_t^2|_a^b-X_a^1X_b^2+X_a^1X_a^2-X_a^2X_b^1+X_a^2X_a^1\\&amp;&#x3D;X_b^1X_b^2+X_a^1X_a^2-X_a^1X_b^2-X_b^1X_a^2<br>\end{aligned}<br>$$</p>
+<p>显然，左式&#x3D;右式，命题证毕。</p>
+</li>
+<li><p>陈氏恒等式</p>
+<p>首先定义符号$\otimes$有如下含义：<br>$$<br>e_{i_1}\cdots e_{i_k}\otimes e_{j_1}\cdots e_{j_m}&#x3D;e_{i_1}\cdots e_{i_k}e_{j_1}\cdots e_{j_m}<br>$$<br>在形式幂级数中有（注意：这里的e是formal indeterminates，是一种不定项，可以理解为C中的占位符）：<br>$$<br>(\sum_{k&#x3D;0}^\infty\sum_{i_1,\cdots,i_k\in{1,\cdots,d} }\lambda_{i_1,\cdots,i_k}e_{i_1}\cdots e_{i_k})\otimes(\sum_{k&#x3D;0}^\infty\sum_{i_1,\cdots,i_k\in{1,\cdots,d} }\mu_{i_1,\cdots,i_k}e_{i_1}\cdots e_{i_k})\\&#x3D;\lambda_0\mu_0+\sum_{i&#x3D;1}^d(\lambda_0\mu_i+\lambda_i\mu_0)e_i+\sum_{i,j&#x3D;1}^d(\lambda_0\mu_{i,j}+\lambda_i\mu_j+\lambda_{i,j}\mu_0)e_ie_j+\cdots<br>$$<br>基于此，路径X的签名可以使用形式幂级数来进行表示：<br>$$<br>Sig(X) _ {a,b}&#x3D;\sum _ {k&#x3D;0}^\infty \sum _ {i_1,\cdots,i_k\in{1,\cdots,d} }S(X) _ {a,b}^{i_1,\cdots,i_k}e_{i_1}\cdots e_{i_k}<br>$$</p>
+<p>于是两条路径$X:[a,b]\to R^d$和$Y:[b,c]\to R^d$的拼接$ X \ast Y $的路径签名可以转换成$ \otimes $形式：<br>$$<br>Sig(X \ast Y) _ {a,c}&#x3D;Sig(X) _ {a,b} \otimes Sig(Y) _ {b,c}<br>$$</p>
+</li>
+<li><p>时间翻转</p>
+<p>路径X的签名是反向运行X得到的签名的$\otimes$的倒数。</p>
+<p>定义路径$X:[a,b]\to R^d$的时间反转为路径$\mathop{X}\limits^{\gets}:[a,b]\to R^d$，其中$\mathop{X_t}\limits^{\gets}&#x3D;X_{a+b-t},t\in[a,b]$。则有：<br>$$<br>Sig(X) _ {a,b}\otimes Sig(\mathop{X}\limits^{\gets}) _ {a,b}&#x3D;1<br>$$</p>
+</li>
+<li><p>对数签名</p>
+<p>对数签名是路径签名的一种变换，本质上是形式幂级数的形式对数。对于如下的形式幂级数：<br>$$<br>x&#x3D;\sum_{k&#x3D;0}^\infty\sum_{i_1,\cdots,i_k\in{1,\cdots,d} }\lambda_{i_1,\cdots,i_k}e_{i_1}\cdots e_{i_k}<br>$$<br>其对数形式被定义为：<br>$$<br>log(x)&#x3D;log(\lambda_0)+\sum_{n\ge 1}\frac{(-1)^n}{n}(1-\frac{x}{\lambda_0})^{\otimes n}<br>$$<br>其中$\otimes n$表示关于该乘积的n次幂。类似的，路径X的对数签名的形式幂级数定义为：<br>$$<br>logSig(X) _ {a,b}&#x3D;\sum_{i&#x3D;1}^dS(X) _ {a,b}^ie_i+\sum_{1\le i&lt;j\le d}\frac{1}{2}(S(X) _ {a,b}^{i,j}-S(X) _ {a,b}^{j,i})[e_i,e_j]+\cdots<br>$$<br>其中$[x,y]&#x3D;x\otimes y-y\otimes x$。</p>
+</li>
+</ul>
+<h2 id="Path-Signature的实际应用"><a href="#Path-Signature的实际应用" class="headerlink" title="Path Signature的实际应用"></a>Path Signature的实际应用</h2><p>签名变换的实际应用之一是机器学习算法。正如之前所述，路径签名总结了关于路径的重要信息。当路径由一个顺序的数据流${Xi}$组成时，其签名$S(X)^{ijk\cdots}$的项是数据流的特征的极佳候选项。洗牌积性质允许我们将签名中低阶项的非线性函数表示为签名中高阶项的线性组合。这类似于基函数扩充，自然适用于回归模型的计算。下面就介绍一些具体的例子：</p>
+<h3 id="1、二阶路径签名及二阶对数签名的例子："><a href="#1、二阶路径签名及二阶对数签名的例子：" class="headerlink" title="1、二阶路径签名及二阶对数签名的例子："></a>1、二阶路径签名及二阶对数签名的例子：</h3><p>$$<br>X_i^1&#x3D;{1,3,5,8}\\X_i^2&#x3D;{1,4,2,6}\\t_i&#x3D;{0,1,2,3}<br>$$</p>
+<p>则其二阶路径签名及二阶对数签名为：<br>$$<br>\begin{aligned}<br>Sig(X)&amp;&#x3D;(1,S^{(1)},S^{(2)},S^{(1,1)},S^{(1,2)},S^{(2,1)},S^{(2,2)})\\&amp;&#x3D;(1,7,5,24.5,19,16,12.5)\\log Sig(X)&amp;&#x3D;(S^{(1)},S^{(2)},S^{[1,2]})&#x3D;(7,5,1.5)\\其中S^{[1,2]}&amp;&#x3D;\frac{1}{2}(S^{(1,2)}-S^{(2,1)})<br>\end{aligned}<br>$$<br>以$S^{(1,1)}$为例：<br>$$<br>\begin{aligned}<br>S^{(1,1)}&amp;&#x3D;\int_0^3\int_0^tdX_s^1dX_t^1\\&amp;&#x3D;\int_0^3(X_t^1-1)dX_t^1\\&amp;&#x3D;\frac{(X_t^1)^2}{2}-X_t^1|_0^3\\&amp;&#x3D;(32-8)-(0.5-1)\\&amp;&#x3D;24.5<br>\end{aligned}<br>$$</p>
+<h3 id="2、路径所围绕区域的面积和方向"><a href="#2、路径所围绕区域的面积和方向" class="headerlink" title="2、路径所围绕区域的面积和方向"></a>2、路径所围绕区域的面积和方向</h3><p>对于$S^{(1,2)}$，内层积分是横坐标，外层积分是纵坐标，因此是左图；对于$S^{(2,1)}$内层积分是纵坐标，外层积分是横坐标，因此是右图。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/2710/direction1.png" alt="direction1"></p>
+<p>可以使用右手螺旋定则判定方向。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/2710/direction2.png" alt="direction2"></p>
+<h3 id="3、签名方法在机器学习中的应用"><a href="#3、签名方法在机器学习中的应用" class="headerlink" title="3、签名方法在机器学习中的应用"></a>3、签名方法在机器学习中的应用</h3><p>比如用于时间序列分析、处理时间序列中的缺失值等。</p>
+<h3 id="4、近年来的一些进展"><a href="#4、近年来的一些进展" class="headerlink" title="4、近年来的一些进展"></a>4、近年来的一些进展</h3><ul>
+<li><p>从财务数据流的签名中提取信息</p>
+</li>
+<li><p>使用基于粗糙路径的方法对声音进行压缩</p>
+</li>
+<li><p>数字识别</p>
+<p>在图像识别任务中，路径是几何对象的一个很好的候选。比如在手写数字识别任务中，可以将数字看做是连续的路径，然后签名方法就成为了解决分类问题的一个自然的方法。将签名方法和深度神经网络相结合的方法，在ICDAR2013汉字识别大赛中达到了0.9553的准确率。</p>
+</li>
+<li><p>从过去进行学习，预测未来的统计数据，学习一个不断发展的系统</p>
+</li>
+<li><p>MEG扫描中的模式识别</p>
+</li>
+<li><p>学习治疗对双向情感障碍患者行为模式的影响</p>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/2710.html">https://dreamtomb.github.io/posts/2710.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Path-Signature/">Path Signature</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/22755.html" title="Path Signature Neural Network of Cortical Features for Prediction of Infant Cognitive Scores"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Path Signature Neural Network of Cortical Features for Prediction of Infant Cognitive Scores</div></div></a></div><div class="next-post pull-right"><a href="/posts/40879.html" title="Multi-Task Learning as Multi-Objective Optimization"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Multi-Task Learning as Multi-Objective Optimization</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/38271.html" title="Deep Signature Transforms"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-08-25</div><div class="title">Deep Signature Transforms</div></div></a></div><div><a href="/posts/22755.html" title="Path Signature Neural Network of Cortical Features for Prediction of Infant Cognitive Scores"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-08-19</div><div class="title">Path Signature Neural Network of Cortical Features for Prediction of Infant Cognitive Scores</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#A-Primer-on-the-Signature-Method-in-Machine-Learning"><span class="toc-number">1.</span> <span class="toc-text">A Primer on the Signature Method in Machine Learning</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Path-Signature%E7%9A%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">1.1.</span> <span class="toc-text">Path Signature的基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81path"><span class="toc-number">1.1.1.</span> <span class="toc-text">1、path</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81path-integral"><span class="toc-number">1.1.2.</span> <span class="toc-text">2、path integral</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81path-signature"><span class="toc-number">1.1.3.</span> <span class="toc-text">3、path signature</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81path-signature%E7%9A%84%E5%8A%A8%E6%9C%BA%E2%80%94%E2%80%94Picard-%E8%BF%AD%E4%BB%A3"><span class="toc-number">1.1.4.</span> <span class="toc-text">4、path signature的动机——Picard 迭代</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81signature%E7%9A%84%E9%87%8D%E8%A6%81%E5%B1%9E%E6%80%A7"><span class="toc-number">1.1.5.</span> <span class="toc-text">5、signature的重要属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Path-Signature%E7%9A%84%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8"><span class="toc-number">1.2.</span> <span class="toc-text">Path Signature的实际应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E4%BA%8C%E9%98%B6%E8%B7%AF%E5%BE%84%E7%AD%BE%E5%90%8D%E5%8F%8A%E4%BA%8C%E9%98%B6%E5%AF%B9%E6%95%B0%E7%AD%BE%E5%90%8D%E7%9A%84%E4%BE%8B%E5%AD%90%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">1、二阶路径签名及二阶对数签名的例子：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E8%B7%AF%E5%BE%84%E6%89%80%E5%9B%B4%E7%BB%95%E5%8C%BA%E5%9F%9F%E7%9A%84%E9%9D%A2%E7%A7%AF%E5%92%8C%E6%96%B9%E5%90%91"><span class="toc-number">1.2.2.</span> <span class="toc-text">2、路径所围绕区域的面积和方向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E7%AD%BE%E5%90%8D%E6%96%B9%E6%B3%95%E5%9C%A8%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="toc-number">1.2.3.</span> <span class="toc-text">3、签名方法在机器学习中的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E8%BF%91%E5%B9%B4%E6%9D%A5%E7%9A%84%E4%B8%80%E4%BA%9B%E8%BF%9B%E5%B1%95"><span class="toc-number">1.2.4.</span> <span class="toc-text">4、近年来的一些进展</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

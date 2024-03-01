@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Prefix-Tuning_Prompt-Tuning论文笔记 | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Prefix-Tuning_Prompt-Tuning论文笔记当前NLP任务的主流方向大致有两种：预训练模型+finetuning以及预训练模型+Prompt+预测。前者存在着种种问题：首先，预训练的训练形式与下游任务有很大的鸿沟，难以完全发挥预训练模型的潜能，而且需要大量数据去填补这样的鸿沟，直接导致这种方法在下游任务数据不足的时候学习能力差。其次，数千亿参数的预训练模型在fine-tuning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Prefix-Tuning_Prompt-Tuning论文笔记">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/5555.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="Prefix-Tuning_Prompt-Tuning论文笔记当前NLP任务的主流方向大致有两种：预训练模型+finetuning以及预训练模型+Prompt+预测。前者存在着种种问题：首先，预训练的训练形式与下游任务有很大的鸿沟，难以完全发挥预训练模型的潜能，而且需要大量数据去填补这样的鸿沟，直接导致这种方法在下游任务数据不足的时候学习能力差。其次，数千亿参数的预训练模型在fine-tuning">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-03-27T01:45:33.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:37.105Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/5555.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Prefix-Tuning_Prompt-Tuning论文笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:37'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Prefix-Tuning_Prompt-Tuning论文笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-03-27T01:45:33.000Z" title="发表于 2023-03-27 09:45:33">2023-03-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:37.105Z" title="更新于 2024-03-01 17:36:37">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/LLM/">LLM</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>6分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Prefix-Tuning_Prompt-Tuning论文笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Prefix-Tuning-Prompt-Tuning论文笔记"><a href="#Prefix-Tuning-Prompt-Tuning论文笔记" class="headerlink" title="Prefix-Tuning_Prompt-Tuning论文笔记"></a>Prefix-Tuning_Prompt-Tuning论文笔记</h1><p>当前NLP任务的主流方向大致有两种：<strong>预训练模型+finetuning</strong>以及<strong>预训练模型+Prompt+预测</strong>。前者存在着种种问题：首先，<strong>预训练的训练形式与下游任务有很大的鸿沟，难以完全发挥预训练模型的潜能，而且需要大量数据去填补这样的鸿沟，直接导致这种方法在下游任务数据不足的时候学习能力差</strong>。其次，<strong>数千亿参数的预训练模型在fine-tuning的时候需要庞大的算力和显存以及很长的时间，成本太大，此外对于每一个形式的下游任务都需要fine-tuning一个新模型去进行部署，过于冗余浪费</strong>。因此，prompt learning开始获得关注，这里先对prompt learning方法做一个简单的综述。</p>
+<h2 id="prompt-learning"><a href="#prompt-learning" class="headerlink" title="prompt learning"></a>prompt learning</h2><p>GPT-3提出了In-Context Learning，证明了在Zero-shot、Few-shot场景下，模型不需要学习任何额外参数，只要在推断的过程中加入一些提示，就能达到不错的效果；这说明预训练模型中存在大量甚至可以说充足的知识，预训练模型本身学会的知识让它具有小样本学习能力。但是前面提到过，使用fine-tuning的话在小样本下游任务上会导致过拟合，因此需要找寻其他的tuning方法，而非全局的fine-tuning。</p>
+<h3 id="Prompt-Learning-的本质"><a href="#Prompt-Learning-的本质" class="headerlink" title="Prompt Learning 的本质"></a>Prompt Learning 的本质</h3><p>将所有下游任务统一成预训练任务（或许是T5给的启发，将分类、总结等各种任务统一为text-to-text的文本生成类任务）；<strong>以特定的模板，将下游任务的数据转成契合上游预训练任务的形式</strong>，充分挖掘预训练模型本身的能力。</p>
+<p>举例：对于情感分类问题，要将输入蕴含的情感进行二分类。原始输入如果是：特效非常酷炫，我很喜欢。那么现在Prompt learning中的输入变为：特效非常酷炫，我很喜欢。这是一部[MASK]电影。</p>
+<h3 id="典型的Prompt-Learning方法总结"><a href="#典型的Prompt-Learning方法总结" class="headerlink" title="典型的Prompt Learning方法总结"></a>典型的Prompt Learning方法总结</h3><ol>
+<li><p>硬模板方法：人工设计&#x2F;自动构建基于<strong>离散 token</strong>的模板，比如[x] is located in [y].</p>
+<p>1）PET   2）LM-BFF</p>
+</li>
+<li><p>软模板方法：这种方法不再追求模板的直观可解释性，不再设计&#x2F;搜索硬模板，而是直接优化Prompt Token Embedding（例如prefix或者soft-prompt，都是<strong>可学习的参数</strong>），<strong>自动化地寻找连续空间中的合适模板</strong>，现在的方法大都选择这种。</p>
+<p>1）P-tuning    2）Prefix Tuning    3）prompt-tuning</p>
+</li>
+</ol>
+<h2 id="Prefix-Tuning"><a href="#Prefix-Tuning" class="headerlink" title="Prefix-Tuning"></a>Prefix-Tuning</h2><p>Fine-Tuning是利用大规模预训练语言模型来执行下游任务的一种方法。但是，它会修改语言模型的所有参数，因此需要为每个任务存储一个完整的副本。因此，作者提出了Prefix-Tuning，这是一种针对自然语言生成任务的fine-tuning的轻量级替代方法，它可以冻结语言模型的参数，只优化一个连续的特定任务的小向量（称为前缀）。经过实验发现只要0.1%fine-tuning的参数，prefix-tuning模型在小数据集上的表现就超过了fine-tuning，在大数据集上的表现媲美fine-tuning。</p>
+<ol>
+<li><p>prefix-tuning的示意图，以及跟fine-tuning的区别如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/prefix_tuning.png" alt="prefix_tuning"></p>
+<p>fine-tuning需要调整所有参数（粉红色的部分），而prefix-tuning只需要调整prefix部分，大大减少了tuning过程所需的时间、算力以及存储模型所需的空间。<strong>值得注意的是作者将token优化为连续词嵌入，而不是离散token，其效果将向上传播到所有Transformer激活层，然后向右传播到后续token</strong>。</p>
+</li>
+<li><p>prefix-tuning的一个例子如下所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/prefix_example.png" alt="prefix_example"></p>
+<p>对于Autoregressive-LM，增加前缀变为z&#x3D;[PREFIX;x;y]；对于Encoder-Decoder模型，增加前缀变为z&#x3D;[PREFIX;x;PREFIX‘;y]。</p>
+</li>
+<li><p>prefix-tuning时，首先要初始化一个可训练的矩阵$P_{\theta}$用于储存前缀参数，它的维度是$|P_{idx}|\times  dim(h_i)$，其中$|P_{idx}|$代表前缀的长度，$h_i$代表第i个时间步下所有激活层结果的拼接。此外，作者发现直接更新前缀参数会出现不稳定的情况，甚至模型表现还有轻微的下降，因此作者对前缀参数矩阵进行重参数化：$P_\theta[i,:]&#x3D;MLP_\theta(P_\theta^{’}[i,:])$。其中$P_{\theta}^{‘}$的第一维度和$P_{\theta}$一样（前缀长度），第二维度比后者小，然后经过一个扩大维数的MLP即可。一旦训练完成，这些重参数化的参数就可以丢弃，只保留$P_{\theta}$。</p>
+</li>
+<li><p>数据集：</p>
+<ul>
+<li>table-to-text task:E2E，WebNLG，DART。</li>
+<li>summarization task:XSUM。</li>
+</ul>
+</li>
+<li><p>作者使用GPT-2模型，利用prefix-tuning进行了实验，实验结果如下所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/prefix_performance.png" alt="prefix_performance"></p>
+</li>
+<li><p>此外，作者研究了内在因素对prefix-tuning效果的影响。包含如下方面：</p>
+<ul>
+<li>前缀长度————先逐渐增高然后略有降低。</li>
+<li><strong>只调整embedding层</strong>————性能下降很大。</li>
+<li>使用内缀（在x和y之间插入和训练的激活）替代前缀————性能有所下降。</li>
+<li>前缀初始化策略————使用真实单词的激活比随机的初始化要好。</li>
+</ul>
+</li>
+</ol>
+<h2 id="Prompt-Tuning"><a href="#Prompt-Tuning" class="headerlink" title="Prompt-Tuning"></a>Prompt-Tuning</h2><p>Prompt-Tunning是以上prefix-Tunning的简化版本，它使用100个prefix token作为默认参数，大于以上prefix-tuning默认的10个token，不过差异在于prompt-Tunning<strong>只对输入层(Embedding)进行微调</strong>，而Prefix是对虚拟Token对应的上游layer全部进行微调。因此Prompt-Tunning的微调参数量级要更小，且不需要修改原始模型结构，这是“简化”的来源。相同的prefix长度，Prompt-Tunning(&lt;0.01%)微调的参数量级要比Prefix-Tunning(0.1%~1%)小10倍以上。</p>
+<ol>
+<li><p>110亿的T5模型借助prompt-tuning(上面prefix-tuning使用的是15亿的GPT2)，已经可以打平在下游多任务联合微调的LM模型，并且远远的甩开了Prompt Design（GPT3 few-shot所使用的方法），实验结果如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/prompt_result.png" alt="prompt_result"></p>
+<p>在110亿参数下，prompt-tuning的T5跟多任务调优的T5达到了相同的表现，但是调优的参数比后者少了20000倍。prompt-tuning的T5-small和GPT-3 XL有相同的表现，两者参数量差了16倍，prompt-tuning的T5-large更是超过了GPT-3 175B，两者参数量差了220倍。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/task_parameters.png" alt="task_parameters"></p>
+</li>
+<li><p>prompt-tuning的示意图如下所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/prompt-tuning.png" alt="prompt-tuning"></p>
+</li>
+<li><p>作者进行了许多消融实验来探索影响prompt-tuning效果的因素。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/ablation.png" alt="ablation"></p>
+<ul>
+<li>prompt长度:尝试了五种长度的prompt，超过20个token的prompt可以获得大的收益。</li>
+<li>prompt初始化策略：测试了随机初始化和词汇表采样策略以及类标签初始化，后者效果最好。</li>
+<li>预训练目标：测试了T5的Span Corruption、Span Corruption+sentinel以及LM Adaptation三种方法，发现最后一种是最好的，所有的Span Corruption都不太适用于prompt-tuning。</li>
+<li>LM adaptation：作者尝试了四种adaptation步数，发现步数越长效果越好。</li>
+</ul>
+<p>对于以上所有消融实验，当参数足够多的时候这四种因素并不会带来大的影响。</p>
+</li>
+<li><p>在域迁移问题上，实验表明prompt tuning优于fine tuning，结果如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/domin.png" alt="domin"></p>
+</li>
+<li><p>提出了“提示集成”方法。模型集成的方法随着模型大小的不断增加已经不再合适，因此作者在同一个任务上训练了N个prompt，通过这样的方式以极小的代价实现了模型的集成，实现了不错的效果。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/5555/ensemble.png" alt="ensemble"></p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/5555.html">https://dreamtomb.github.io/posts/5555.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/32612.html" title="A Survey of Large Language Models论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">A Survey of Large Language Models论文笔记</div></div></a></div><div class="next-post pull-right"><a href="/posts/43168.html" title="T5论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">T5论文笔记</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/20606.html" title="2023-10-10论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-26</div><div class="title">2023-10-10论文笔记</div></div></a></div><div><a href="/posts/17086.html" title="2023-11-21论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-21</div><div class="title">2023-11-21论文笔记</div></div></a></div><div><a href="/posts/35052.html" title="2023-11-7论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-07</div><div class="title">2023-11-7论文笔记</div></div></a></div><div><a href="/posts/62963.html" title="2023-12-05论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-04</div><div class="title">2023-12-05论文笔记</div></div></a></div><div><a href="/posts/63715.html" title="2023-12-19论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-19</div><div class="title">2023-12-19论文笔记</div></div></a></div><div><a href="/posts/32612.html" title="A Survey of Large Language Models论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-06</div><div class="title">A Survey of Large Language Models论文笔记</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Prefix-Tuning-Prompt-Tuning%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0"><span class="toc-number">1.</span> <span class="toc-text">Prefix-Tuning_Prompt-Tuning论文笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#prompt-learning"><span class="toc-number">1.1.</span> <span class="toc-text">prompt learning</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Prompt-Learning-%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-number">1.1.1.</span> <span class="toc-text">Prompt Learning 的本质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E7%9A%84Prompt-Learning%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93"><span class="toc-number">1.1.2.</span> <span class="toc-text">典型的Prompt Learning方法总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prefix-Tuning"><span class="toc-number">1.2.</span> <span class="toc-text">Prefix-Tuning</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prompt-Tuning"><span class="toc-number">1.3.</span> <span class="toc-text">Prompt-Tuning</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

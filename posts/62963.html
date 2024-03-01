@@ -1,0 +1,262 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2023-12-05论文笔记 | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="关于 LLMs 中强化学习步骤里 PPO 算法的具体实现LLMs 场景下强化学习的整体流程对于一般的强化学习而言，会有一个做动作的策略网络 $\pi$，它根据自己观测的状态 $s_i$，做出动作 $a_i$ 跟环境进行交互，然后环境会返回一个反馈 $r_i$，同时进入到下一个状态 $s_{i+1}$；策略网络再继续观测状态 $s_{i+1}$ 做出下一个动作 $a_{i+1}$ …直到达到最终状态">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023-12-05论文笔记">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/62963.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="关于 LLMs 中强化学习步骤里 PPO 算法的具体实现LLMs 场景下强化学习的整体流程对于一般的强化学习而言，会有一个做动作的策略网络 $\pi$，它根据自己观测的状态 $s_i$，做出动作 $a_i$ 跟环境进行交互，然后环境会返回一个反馈 $r_i$，同时进入到下一个状态 $s_{i+1}$；策略网络再继续观测状态 $s_{i+1}$ 做出下一个动作 $a_{i+1}$ …直到达到最终状态">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-12-04T12:58:41.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:36.992Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/62963.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2023-12-05论文笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:36'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2023-12-05论文笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:36.992Z" title="更新于 2024-03-01 17:36:36">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/LLM/">LLM</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>15分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2023-12-05论文笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="关于-LLMs-中强化学习步骤里-PPO-算法的具体实现"><a href="#关于-LLMs-中强化学习步骤里-PPO-算法的具体实现" class="headerlink" title="关于 LLMs 中强化学习步骤里 PPO 算法的具体实现"></a>关于 LLMs 中强化学习步骤里 PPO 算法的具体实现</h1><h2 id="LLMs-场景下强化学习的整体流程"><a href="#LLMs-场景下强化学习的整体流程" class="headerlink" title="LLMs 场景下强化学习的整体流程"></a>LLMs 场景下强化学习的整体流程</h2><p>对于一般的强化学习而言，会有一个做动作的策略网络 $\pi$，它根据自己观测的状态 $s_i$，做出动作 $a_i$ 跟环境进行交互，然后环境会返回一个反馈 $r_i$，同时进入到下一个状态 $s_{i+1}$；策略网络再继续观测状态 $s_{i+1}$ 做出下一个动作 $a_{i+1}$ …直到达到最终状态。这样，策略网络和环境的一系列互动后最终会得到一个轨迹(trajectory)，一般在一个轨迹上训练完叫做一个episode:<br>$$<br>\tau&#x3D;{s_1,a_1,r_1,s_2,a_2,r_2,\cdots,s_T,a_T,r_T}<br>$$<br>在 LLMs 训练的场景下，策略网络就是待微调的 LLMs，它做的事情就是接受 context（状态），执行后返回一系列文本（或者只是文本上的概率分布）（动作）。该策略的动作空间是与语言模型的词汇表相对应的所有 tokens，观察空间是可能的输入token 序列的分布，该分布也十分巨大，奖励函数是偏好模型和policy shift 约束的结合。</p>
+<h2 id="PPO-算法的具体实现"><a href="#PPO-算法的具体实现" class="headerlink" title="PPO 算法的具体实现"></a>PPO 算法的具体实现</h2><p>形象地来说，就像是学生和老师一样，老师出题，学生根据题目进行答题，老师判断学生回答的正确与否，然后学生根据评判结果重新修改自己对知识的理解。具体来说，LLMs 中 PPO 算法的大体流程如下（伪代码）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">policy_model = load_model()</span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20000</span>):</span><br><span class="line">    <span class="comment"># 采样（生成答案）</span></span><br><span class="line">    prompts = sample_prompt()</span><br><span class="line">    data = respond(policy_model, prompts)</span><br><span class="line">    <span class="comment"># 反馈（计算奖励）</span></span><br><span class="line">    rewards = reward_func(reward_model, data)</span><br><span class="line">    <span class="comment"># 学习（更新参数）</span></span><br><span class="line">    <span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        policy_model = train(policy_model, prompts, data, rewards)</span><br></pre></td></tr></table></figure>
+
+<p>接下来便分成这三个阶段对该算法的实现进行学习。</p>
+<h3 id="采样"><a href="#采样" class="headerlink" title="采样"></a>采样</h3><p><strong>采样就是 LLMs 根据提示（prompt）输出回答（response）的过程，或者说是模型自行生产 RLHF 训练数据的过程。</strong></p>
+<p>先明确一个概念——策略（policy），它就是 RLHF 中的“学生”，我们则扮演着老师的角色，给出有趣的问题，而模型则会像小学生一样，不断尝试给出答案。模型会对着黑板写下它的答案，有时候是正确的，有时候会有错误。我们会仔细检查每一个答案，如果它表现得好，就会给予它高声赞扬；如果它表现不佳，我们则会给予它耐心的指导和反馈，帮助它不断改进，直到达到令人满意的水平。</p>
+<p>policy 由两个模型组成，一个叫做演员模型（Actor），另一个叫做评论家模型（Critic）。它们就像是学生大脑中的两种意识，一个负责决策，一个负责总结得失。其中演员就是我们想要训练出来的 LLMs。在用 PPO 训练它之前，它就是训练好的SFT（Supervised Fine-Tuning）model。输入一段上下文，它将输出下一个 token 的概率分布。评论家是强化学习的辅助模型，输入一段上下文，它将输出下一个 token 的“收益”，也就是从下一个 token 开始，模型能够获得的总奖励（浮点数标量）。从实现上说，评论家就是将演员模型的倒数第二层连接到一个新的全连接层上。除了这个全连接层之外，演员和评论家的参数都是共享的。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/ac.png" alt="ac.png"></p>
+<p>下图是 PPO 算法采样阶段的示意图，<strong>采样指的是 old_policy 从 prompt 池中抽出 M 个 prompt 后，对每个 prompt 进行语言模型生成的 token 采样</strong>：</p>
+<ul>
+<li>计算 response 的第1个 token 的概率分布，然后从概率分布中采样出第1个 token</li>
+<li>根据第1个 token，计算 response 的第2个 token 的概率分布，然后从概率分布中采样出第2个 token</li>
+<li>……</li>
+<li>根据前 N-1 个 token，计算 response 的第 N 个 token 的概率分布，然后从概率分布中采样出第 N 个 token</li>
+</ul>
+<p>然后基于给定的 prompt，我们可以得到三个输出，假设对每个 prompt ，policy 生成的 token 的个数为 N，那么这三个输出分别是：</p>
+<ul>
+<li>response：M 个字符串，每个字符串包含 N 个 token</li>
+<li>old_log_probs：演员输出的 $M\times N$ 的张量，包含了 response 中 token 的对数概率 $log⁡(P(token|context))$</li>
+<li>old_values：评论家输出的 $M\times N$ 的张量，包含了每次生成 token 时评论家预估的收益</li>
+</ul>
+<p>得到这三个输出后，采样阶段就就结束了。这三个输出都是后续阶段重要的输入数据。至此，学生答题部分结束。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/sample.png" alt="sample.png"></p>
+<h3 id="反馈"><a href="#反馈" class="headerlink" title="反馈"></a>反馈</h3><p><strong>反馈就是老师检查答案的过程，是奖励模型（Reward Model）给 response 打分的过程。</strong>下图是 PPO 中 reward model 的使用方法：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/reward.png" alt="reward.png"></p>
+<p>从图中我们可以看出，左上角的绿色矩形 reward model 拿到 prompt 和 response，然后输出了分数 score。实际上发生的事情是，prompt 和 response 被拼接成一个字符串，接着被送入到 reward model 中，最后 reward model 计算出了匹配分数。显然，在图中，score 并不是最终的奖励，它和最终的奖励 rewards 之间还隔着一个 reward function 函数。<strong>这是因为score只能衡量结果的对错，不能衡量过程的合理性。怎么衡量过程的合理性呢？一种简单粗暴的方法是：循规蹈矩，即为合理。</strong></p>
+<p>在一个已有的相对完备的理论系统中，突然出现一个与理论相矛盾的假说，那大家就有必要基于现有的经验给予适当的质疑。因为并非每一次对现有真理的质疑都是正确的（事实上大多数都是错误的），而如果这个假说真的得到验证，那么就是给予肯定和荣誉的时候了。<strong>语言模型也是一样，在我们给予最终奖励之前，最好也对它的“标新立异”给予少量的惩罚（即刚刚说的质疑）。</strong></p>
+<p>那么我们该怎么做呢？那就是给它立一个规矩，只要它按照这个规矩来，就能获得少量奖励。而这个规矩就是我们在 SFT 阶段已经训练好的语言模型 ref_policy（图中右下角的绿色矩形），或者说是完全还没经过强化学习训练的语言模型。过程合理性奖励的计算方式是这样的：ref_policy 拿到 prompt，然后给 old_policy 生成的 response 的每个 token 计算对数概率，得到一个张量 ref_log_prob。现在假设 old_policy 的演员模型生成了第 i 个 token，此时它应该获得的奖励为 $ref\_log\_prob[i]-old\_log\_prob[i]$。来理解一下这个式子：</p>
+<ul>
+<li>ref_log_prob[i] 越高，ref_policy 越认可 old_policy 的输出，说明 old_policy 更守规矩，因此应该获得更高的奖励</li>
+<li>old_log_prob[i] 越高，old_policy 获得的奖励反而更低，old_log_prob[i] 作为正则项，可以保证概率分布的多样性</li>
+</ul>
+<p><strong>最终，我们将过程合理性奖励和结果正确性奖励合并起来，就得到了最终奖励的计算方式：</strong><br>$$<br>\text{reward[i]}&#x3D;\begin{cases}\text{ref_}\log_\text{prob}[i]-\text{old_}\log_\text{prob}[i],&amp;i&lt;N\\text{ref_}\log_\text{prob}[N]-\text{old_}\log_\text{prob}[N]+\textit{score},&amp;i&#x3D;N\end{cases}<br>$$<br>值得指出的是，结果正确性奖励只有在最后一个 token 上才会使用，这就是上图中 reward function 的计算方法，此外，我们只对 response 计算奖励，在整个反馈阶段，reward_model 和 ref_policy 是不更新参数的。至此，老师反馈阶段结束。</p>
+<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><p><strong>“学习”就是学生根据反馈总结得失并自我改进的过程，或者说是强化优势动作的过程。</strong></p>
+<p>如果说前两步的采样和反馈分别是在收集数据X，以及给数据打上标签Y。那么这一步就是在利用数据(X, Y)训练模型。”强化优势动作”是PPO学习阶段的焦点。在深入探讨之前，我们首先要明确一个关键概念——优势。<strong>此处，我们将优势定义为“实际获得的收益超出预期的程度”。</strong></p>
+<p>在 PPO 算法中计算优势的方法就是<strong>实际收益 - 预期收益</strong>。对于语言模型而言，生成第 i 个 token 的实际收益就是：从生成第 i 个 token 开始到生成第 N 个 token 为止，所能获得的所有奖励的总和。我们用 return 来表示实际收益，它的计算方式为：$return[i]&#x3D;\sum_{j&#x3D;i}^N reward[j]$ 。对于预期收益来说，我们在“采样”阶段提到过，policy 包含演员模型和评论家模型，其中后者是用来预估收益的。其实，当时说的收益 old_values 就是现在我们想要计算的预期收益。评论家会为 response 中的每个 token 计算一个预期收益，第 i 个预期收益记为 old_values[i]。现在，我们可以这样计算生成第 i 个 token 的优势 a 了：$a[i]&#x3D;return[i]-old\_values[i]$。接下来，我们就要使用优势 a 来进行“强化优势动作”的操作。</p>
+<p><strong>所谓“强化优势动作”，即强化那些展现出显著优势的动作。</strong>在语言模型中，根据上下文生成一个 token 就是所谓的“动作”。”强化优势动作”表示：如果在上下文（context）中生成了某个 token，并且这个动作的优势很高，那么我们应该增加生成该 token 的概率，也就是说我们可以给演员模型设计一个损失函数，通过优化损失函数来实现“强化优势动作”的目的，这个损失函数定义如下：<br>$$<br>\text{actor_loss}&#x3D;-\dfrac{1}{N}\sum_{i&#x3D;1}^{N}a[i]\times\frac{p\text{(token[i] | context)}}{p_{old}\text{(token[i] | context)}}<br>$$<br>其中：</p>
+<ul>
+<li>当优势大于0时，概率越大，loss越小；因此优化器会通过增大概率（即强化优势动作）来减小loss</li>
+<li>当优势小于0时，概率越小，loss越小；因此优化器会通过减小概率（即弱化劣势动作）来减小loss</li>
+<li>PPO 中，每份数据在每次迭代的学习阶段中都会使用四次，P_old 指的是同一次迭代的还未进入学习阶段的演员模型，因为它不接收梯度回传，因此可以视为一个常量</li>
+<li>分母的作用在于当生成某个 token 的概率已经很大了的时候，即便这个动作的优势很大，也不要再使劲增大概率了，也就是步子不要迈得太大</li>
+<li>分子部分可以使用当前的演员模型计算得到，分母部分就是采样阶段的 old_log_probs</li>
+</ul>
+<p>上面描述的都是演员模型的优化，下面就要介绍评论家的优化了：</p>
+<p>我们提到过，评论家会为 response 中的每个 token 计算一个预期收益 values[i]，估计的目标是奖励模型 reward[i] 的累加 return[i]，于是，很自然地，PPO 算法设计了一个损失函数来衡量评论家预期收益和真实收益之间的差距，这个损失函数就是均方差损失：<br>$$<br>\text{critic_loss}&#x3D;\frac{1}{2N}\sum_{i&#x3D;1}^{N}(\text{values}[i]-\text{return}[i])^2<br>$$<br>最终优化 policy 时用的 loss 是演员和评论家的 loss 的加权和：<br>$$<br>\text{loss}&#x3D;\text{actor_loss}+0.1\times\text{critic_loss}<br>$$<br>学习阶段的整体流程图如下所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/learn.png" alt="learn.png"></p>
+<h3 id="完整伪代码"><a href="#完整伪代码" class="headerlink" title="完整伪代码"></a>完整伪代码</h3><p>在梳理完全部流程之后我们便能补全最开始给出的伪代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">policy_model = load_model()</span><br><span class="line">ref_policy_model = policy_model.copy()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20000</span>):</span><br><span class="line">    <span class="comment"># 采样</span></span><br><span class="line">    prompts = sample_prompt()</span><br><span class="line">    responses, old_log_probs, old_values = respond(policy_model, prompts)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 反馈</span></span><br><span class="line">    scores = reward_model(prompts, responses)</span><br><span class="line">    ref_log_probs, _ = analyze_responses(ref_policy_model, prompts, responses)</span><br><span class="line">    rewards = reward_func(reward_model, scores, old_log_probs, ref_log_probs)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 学习</span></span><br><span class="line">    <span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>):</span><br><span class="line">        log_probs, values = analyze_responses(policy_model, prompts, responses)</span><br><span class="line">        advantages = advantage_func(rewards, old_values)</span><br><span class="line">        actor_loss = actor_loss_func(advantages, old_log_probs, log_probs)</span><br><span class="line">        critic_loss = critic_loss_func(rewards, values)</span><br><span class="line">        loss = actor_loss + <span class="number">0.1</span> * critic_loss</span><br><span class="line">        train(loss, policy_model.parameters())</span><br></pre></td></tr></table></figure>
+
+<h2 id="如何更加高效地训练有偏好的-LLMs"><a href="#如何更加高效地训练有偏好的-LLMs" class="headerlink" title="如何更加高效地训练有偏好的 LLMs"></a>如何更加高效地训练有偏好的 LLMs</h2><p>前面总结了 RLHF 中 PPO 算法的具体实现，但是现有的强化学习算法却仍有一些不足：</p>
+<ul>
+<li>人工产生的偏好数据集成本较高，很难量产</li>
+<li>三个阶段的训练（ SFT -&gt; RM -&gt; PPO ）过程较长，更新迭代较慢</li>
+<li>PPO 的训练过程同时存在4个模型（2训练，2推理），对计算资源的要求较高。</li>
+</ul>
+<p>因此，当前的改进优化思路主要有以下几个方向：</p>
+<h3 id="方式一：使用AI替代人类"><a href="#方式一：使用AI替代人类" class="headerlink" title="方式一：使用AI替代人类"></a>方式一：使用AI替代人类</h3><p>这一类方法使用AI模型来替换人工标注偏好数据，或者指导模型训练。</p>
+<h4 id="RLAIF（RL-from-AI-Feedback）"><a href="#RLAIF（RL-from-AI-Feedback）" class="headerlink" title="RLAIF（RL from AI Feedback）"></a>RLAIF（RL from AI Feedback）</h4><p>该方法可分为<strong>监督训练阶段</strong>和<strong>强化学习阶</strong>段两部分。</p>
+<ol>
+<li><p><strong>监督训练阶段，</strong>此阶段包括以下步骤：</p>
+<ol>
+<li>获得 Helpful 模型对 red teaming提示的响应。 因此，在这些情况下，模型的响应可能是有害的。</li>
+<li>在提供了一套应该遵守的原则，让 Helpful 模型据此评论自己的响应。</li>
+<li>要求 Helpful 模型根据其提供的评论修改其先前的响应。</li>
+<li>重复步骤 2 和 3 进行 n 次迭代。</li>
+<li>针对来自所有有害提示的响应的所有修订版本微调预训练的 LLM，还包括有用的提示和响应的组合，以确保微调后的模型仍然有用，此模型即 <strong>Supervised Learning Constitutional AI (SL-CAI)</strong> 模型。</li>
+</ol>
+</li>
+<li><p><strong>强化学习阶段，</strong>此阶段包括以下步骤：</p>
+<ol>
+<li>使用在上一步训练得到的 SL-CAI 模型生成针对有害提示的响应对。</li>
+<li>使用具有一个原则和一对响应的反馈模型，去选择更无害的响应。</li>
+<li>反馈模型的归一化对数概率用于训练偏好模型&#x2F;奖励模型。</li>
+<li>最后，利用上一步训练的偏好模型作为奖励函数，以 RLHF 方式训练 SL-CAI 模型，得到 <strong>Reinforcement Learning Constitutional AI (RL-CAI)</strong> 模型。</li>
+</ol>
+</li>
+</ol>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/RLAIF.png" alt="RLAIF.png"></p>
+<h4 id="RRHF（Rank-Response-to-align-Human-Feedback）"><a href="#RRHF（Rank-Response-to-align-Human-Feedback）" class="headerlink" title="RRHF（Rank Response to align Human Feedback）"></a>RRHF（<strong>R</strong>ank <strong>R</strong>esponse to align <strong>H</strong>uman <strong>F</strong>eedback）</h4><p>该方法首先从多种来源收集某个 prompt 的响应（模型，chatgpt，人为撰写等），接着基于对数概率对响应进行评分，然后通过排名损失来讲这些分数与人类偏好奖励模型或人类偏好标签的分数进行匹配排序。下图中对比了 PPO 算法和 RRHF 算法的区别：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/RRHF.png" alt="RRHF.png"></p>
+<p>相比 PPO 算法，RRHF的优点有以下几个方面：</p>
+<ul>
+<li>仅需要1到2个模型，而PPO需要4个模型，因此 RRHF 算法更加简单高效。</li>
+<li>监督微调（SFT）可以被看作是 RRHF 算法的一种特殊形式。</li>
+<li>RRHF 算法可以同时被用作语言模型和奖励模型。</li>
+<li>RRHF 算法可以在较低的训练难度下拟合奖励模型的偏好，达到 PPO 算法的效果，并且避免了 PPO 算法中的复杂性和不稳定性问题。</li>
+</ul>
+<h3 id="方式二：优化微调数据"><a href="#方式二：优化微调数据" class="headerlink" title="方式二：优化微调数据"></a>方式二：优化微调数据</h3><p>该类方法的核心在于仅仅通过优质数据集的获取和产生，以训练得到一个效果较好的 SFT 模型，而无需进行 RM 和 PPO 的训练。</p>
+<h4 id="LIMA（Less-Is-More-for-Alignment）"><a href="#LIMA（Less-Is-More-for-Alignment）" class="headerlink" title="LIMA（Less Is More for Alignment）"></a>LIMA（Less Is More for Alignment）</h4><p>浅层对齐假说，即一<strong>个模型的知识和能力几乎完全是在预训练中学习的，而对齐则是教会它与用户交互时如何选择子分布</strong>。如果假说正确，对齐主要有关于学习方式，那么该假说的一个推论是，人们可以用相当少的样本充分调整预训练的语言模型。因此，<strong>该工作假设，对齐可以是一个简单的过程，模型学习与用户互动的风格或格式，以揭示在预训练中已经获得的知识和能力。</strong>消融实验显示，<strong>当扩大数据量而不同时扩大提示多样性时，收益会大大减少，而在优化数据质量时，收益会大大增加。</strong> 此外，尽管没有对话实例，LIMA可以进行连贯的多轮对话，而且这种能力可以通过向训练集添加30条手工制作的多轮对话数据而得到极大的提高。</p>
+<h4 id="MAYBE-ONLY-0-5-DATA-IS-NEEDED"><a href="#MAYBE-ONLY-0-5-DATA-IS-NEEDED" class="headerlink" title="MAYBE ONLY 0.5% DATA IS NEEDED"></a>MAYBE ONLY 0.5% DATA IS NEEDED</h4><p>这篇工作的目的是通过从现有数据中识别出最有价值的核心样本来帮助模型获取下游任务的知识，并仅用少量数据来实现不相上下甚至更好的性能。</p>
+<p>方法流程下图所示，潜在空间用三个矩形表示，每个任务代表其中一个颜色系列。具有相同色系但不同色调的点，对应于来自同一任务但来自不同数据集的数据，如 NLI 任务有 5 个数据集，因此有 5 种不同的色调。主要分为以下几步：</p>
+<ol>
+<li>将每个句子编码成embedding向量，并进行均值池化和 L2 归一化的预处理。</li>
+<li>在潜在空间中，将所有样本点聚类成几个类别。</li>
+<li>从这些聚类样本中进行采样，找到原始分布中的核心样本。</li>
+<li>使用这些检索到的样本来指导微调 LLM 并进行评估。</li>
+</ol>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/maybe.png" alt="maybe.png"></p>
+<h3 id="方式三：优化训练流程"><a href="#方式三：优化训练流程" class="headerlink" title="方式三：优化训练流程"></a>方式三：优化训练流程</h3><p>该类方法通常通过改造模型的训练方式（如只保留 SFT 和 RM），以提高训练效率并减少训练成本。</p>
+<h4 id="RAFT（Reward-rAnked-FineTuning）"><a href="#RAFT（Reward-rAnked-FineTuning）" class="headerlink" title="RAFT（Reward rAnked FineTuning）"></a>RAFT（Reward rAnked FineTuning）</h4><p>该算法的伪代码如下图所示，整个流程分为三个阶段：数据收集、数据排序、模型微调；这三个阶段可以单独实施和执行。 因此，只要计算资源和显存允许在某些特定模型上进行 SFT，对齐过程就可以使用 RAFT 完成。在数据收集阶段，需要从 prompt 集合中采样一批样本，然后对于每个 prompt，让大模型分别生成响应，并计算这些样本的 reward。在数据排序阶段，要对这些样本排序，并选择指定百分比的具有最高奖励的样本作为训练样本。最后，在模型微调阶段，要使用这些筛选过的样本对模型进行微调。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/RAFT.png" alt="RAFT.png"></p>
+<h4 id="DPO（Direct-Preference-Optimization）"><a href="#DPO（Direct-Preference-Optimization）" class="headerlink" title="DPO（Direct Preference Optimization）"></a>DPO（Direct Preference Optimization）</h4><p>该方法提出了一种使用二进制交叉熵目标来精确优化LLM的方法，以替代基于 RL HF 的优化目标，从而大大简化偏好学习 pipeline。也就是说，完全可以直接优化语言模型以实现人类的偏好，而不需要明确的奖励模型或强化学习。</p>
+<p>与现有的算法一样，DPO 也依赖于理论上的偏好模型（如 Bradley-Terry 模型），以此衡量给定的奖励函数与经验偏好数据的吻合程度。然而，现有的方法使用偏好模型定义偏好损失来训练奖励模型，然后训练优化所学奖励模型的策略，而 DPO 使用变量的变化来直接定义偏好损失作为策略的一个函数。鉴于人类对模型响应的偏好数据集，DPO 因此可以使用一个简单的二进制交叉熵目标来优化策略，而不需要明确地学习奖励函数或在训练期间从策略中采样。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/62963/DPO.png" alt="DPO.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/62963.html">https://dreamtomb.github.io/posts/62963.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/63715.html" title="2023-12-19论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023-12-19论文笔记</div></div></a></div><div class="next-post pull-right"><a href="/posts/17086.html" title="2023-11-21论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2023-11-21论文笔记</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/20606.html" title="2023-10-10论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-26</div><div class="title">2023-10-10论文笔记</div></div></a></div><div><a href="/posts/17086.html" title="2023-11-21论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-21</div><div class="title">2023-11-21论文笔记</div></div></a></div><div><a href="/posts/35052.html" title="2023-11-7论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-07</div><div class="title">2023-11-7论文笔记</div></div></a></div><div><a href="/posts/63715.html" title="2023-12-19论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-19</div><div class="title">2023-12-19论文笔记</div></div></a></div><div><a href="/posts/32612.html" title="A Survey of Large Language Models论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-06</div><div class="title">A Survey of Large Language Models论文笔记</div></div></a></div><div><a href="/posts/63332.html" title="A Survey on In-context Learning"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-24</div><div class="title">A Survey on In-context Learning</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E-LLMs-%E4%B8%AD%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E6%AD%A5%E9%AA%A4%E9%87%8C-PPO-%E7%AE%97%E6%B3%95%E7%9A%84%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.</span> <span class="toc-text">关于 LLMs 中强化学习步骤里 PPO 算法的具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#LLMs-%E5%9C%BA%E6%99%AF%E4%B8%8B%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">LLMs 场景下强化学习的整体流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PPO-%E7%AE%97%E6%B3%95%E7%9A%84%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.2.</span> <span class="toc-text">PPO 算法的具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%87%E6%A0%B7"><span class="toc-number">1.2.1.</span> <span class="toc-text">采样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8D%E9%A6%88"><span class="toc-number">1.2.2.</span> <span class="toc-text">反馈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.2.3.</span> <span class="toc-text">学习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="toc-number">1.2.4.</span> <span class="toc-text">完整伪代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E9%AB%98%E6%95%88%E5%9C%B0%E8%AE%AD%E7%BB%83%E6%9C%89%E5%81%8F%E5%A5%BD%E7%9A%84-LLMs"><span class="toc-number">1.3.</span> <span class="toc-text">如何更加高效地训练有偏好的 LLMs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%80%EF%BC%9A%E4%BD%BF%E7%94%A8AI%E6%9B%BF%E4%BB%A3%E4%BA%BA%E7%B1%BB"><span class="toc-number">1.3.1.</span> <span class="toc-text">方式一：使用AI替代人类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RLAIF%EF%BC%88RL-from-AI-Feedback%EF%BC%89"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">RLAIF（RL from AI Feedback）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RRHF%EF%BC%88Rank-Response-to-align-Human-Feedback%EF%BC%89"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">RRHF（Rank Response to align Human Feedback）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E5%BC%8F%E4%BA%8C%EF%BC%9A%E4%BC%98%E5%8C%96%E5%BE%AE%E8%B0%83%E6%95%B0%E6%8D%AE"><span class="toc-number">1.3.2.</span> <span class="toc-text">方式二：优化微调数据</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LIMA%EF%BC%88Less-Is-More-for-Alignment%EF%BC%89"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">LIMA（Less Is More for Alignment）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MAYBE-ONLY-0-5-DATA-IS-NEEDED"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">MAYBE ONLY 0.5% DATA IS NEEDED</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%89%EF%BC%9A%E4%BC%98%E5%8C%96%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.3.</span> <span class="toc-text">方式三：优化训练流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RAFT%EF%BC%88Reward-rAnked-FineTuning%EF%BC%89"><span class="toc-number">1.3.3.1.</span> <span class="toc-text">RAFT（Reward rAnked FineTuning）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DPO%EF%BC%88Direct-Preference-Optimization%EF%BC%89"><span class="toc-number">1.3.3.2.</span> <span class="toc-text">DPO（Direct Preference Optimization）</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

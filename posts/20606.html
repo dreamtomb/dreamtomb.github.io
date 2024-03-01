@@ -1,0 +1,227 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2023-10-10论文笔记 | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Contrastive Decoding: Open-ended Text Generation as Optimization 想要解决的问题大语言模型存在的生成内容无关、重复、不连贯等问题。 灵感来源大语言模型的种种问题在更小的 LMs 上更为明显。 使用的方法 首先需要分别加载好两个 LM ，一个是大语言模型（例如 OPT-13B ），叫做 expert ，一个是小语言模型（例如 OPT-1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023-10-10论文笔记">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/20606.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="Contrastive Decoding: Open-ended Text Generation as Optimization 想要解决的问题大语言模型存在的生成内容无关、重复、不连贯等问题。 灵感来源大语言模型的种种问题在更小的 LMs 上更为明显。 使用的方法 首先需要分别加载好两个 LM ，一个是大语言模型（例如 OPT-13B ），叫做 expert ，一个是小语言模型（例如 OPT-1">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-09-26T08:31:45.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:36.984Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/20606.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2023-10-10论文笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:36'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2023-10-10论文笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:36.984Z" title="更新于 2024-03-01 17:36:36">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/LLM/">LLM</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>8分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2023-10-10论文笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Contrastive-Decoding-Open-ended-Text-Generation-as-Optimization"><a href="#Contrastive-Decoding-Open-ended-Text-Generation-as-Optimization" class="headerlink" title="Contrastive Decoding: Open-ended Text Generation as Optimization"></a>Contrastive Decoding: Open-ended Text Generation as Optimization</h1><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/20606/CD.png" alt="CD.png"></p>
+<h2 id="想要解决的问题"><a href="#想要解决的问题" class="headerlink" title="想要解决的问题"></a>想要解决的问题</h2><p>大语言模型存在的生成内容无关、重复、不连贯等问题。</p>
+<h2 id="灵感来源"><a href="#灵感来源" class="headerlink" title="灵感来源"></a>灵感来源</h2><p>大语言模型的种种问题在更小的 LMs 上更为明显。</p>
+<h2 id="使用的方法"><a href="#使用的方法" class="headerlink" title="使用的方法"></a>使用的方法</h2><ol>
+<li>首先需要分别加载好两个 LM ，一个是大语言模型（例如 OPT-13B ），叫做 expert ，一个是小语言模型（例如 OPT-125M ），叫做 amateur 。并分别使用这两个模型对下一个 token 进行预测。</li>
+<li>考虑到合理性约束的问题，需要将 token 的搜索空间限制在 expert 预测的概率高于某个阈值的子集中。</li>
+<li>接着对该空间之中的每个 token 进行搜索，目标是最大化 expert 对数概率和 amateur 对数概率之间的差异。</li>
+</ol>
+<h2 id="方法效果"><a href="#方法效果" class="headerlink" title="方法效果"></a>方法效果</h2><h1 id="How-Language-Model-Hallucinations-Can-Snowball"><a href="#How-Language-Model-Hallucinations-Can-Snowball" class="headerlink" title="How Language Model Hallucinations Can Snowball"></a>How Language Model Hallucinations Can Snowball</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在之前的论文阅读中，我们主要关注的是那些由于知识的鸿沟而导致的幻觉现象，这篇论文关注的却是来源于其他的幻觉现象。</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在现实应用中，LLMs的主要风险在于它们倾向于产生不正确的陈述，也就是我们所说的幻觉现象。这种生成错误内容的情况通常被认为是因为语言模型自己知识有限所致。但是这篇文章的作者提出了一个假设，那就是在某些情况下，当语言模型试图为自己先前生成的错误内容进行解释或者辩解时，它会产生一些明显错误的说法，而这些错误它本身具有能力认出来。也就是说，有时候语言模型生成错误内容不是因为知识缺乏，而是它在为自己的错误找理由的时候，刻意产生了容易识别为错误的说法。</p>
+<p>作者将“语言模型过度依赖于早期的错误，导致出现更多原本不会犯下的错误“的现象称为“幻觉雪球式增长“。</p>
+<h2 id="本文的工作"><a href="#本文的工作" class="headerlink" title="本文的工作"></a>本文的工作</h2><h3 id="发现"><a href="#发现" class="headerlink" title="发现"></a>发现</h3><p>首先作者对发现的“幻觉雪球式增长“现象进行了测试，发现这种为了跟之前产生的幻觉保持一致性而生成的辩护内容往往会在单独进行测试的时候被判别为假，如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/20606/snowball.png" alt="snowball.png"></p>
+<h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p>作者构造了三个数据集，分别包含了原始问题和独立的验证问题，如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/20606/Dataset.png" alt="Dataset.png"></p>
+<h3 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h3><p>有两点是值得我们注意的：</p>
+<ol>
+<li>通常来说，LLMs的回答由两部分组成：结论以及后续对结论的解释。在三个数据集的实验中，作者发现GPT-4和ChatGPT会立即确定问题的答案，此外，一旦语言模型生成了Yes或No，该词汇将保留在上下文中，并且为了保持一致性，在后续的解释中LLMs会坚持这一选择。</li>
+<li>一些理论工作（William Merrill and Ashish Sabharwal. 2023. The parallelism tradeoff: Limitations of log-precision transformers）证明了Transformer无法在单个时间步内解决素数判别或图连接等等具有潜在顺序推理的问题。因此，要求Transformer在单个时间步内解决需要多个时间步才能正确回答的问题，势必会导致LLMs在有时给出一个不正确的答案。</li>
+</ol>
+<p>作者认为，这两点都会导致语言模型产生它本不会生成的支持错误事实的幻觉。</p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p>经过实验，作者发现在这三个数据集中，绝大多数的幻觉都属于“雪球式幻觉”，如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/20606/percent.png" alt="percent.png"></p>
+<h2 id="如何预防雪球式幻觉"><a href="#如何预防雪球式幻觉" class="headerlink" title="如何预防雪球式幻觉"></a>如何预防雪球式幻觉</h2><p>关于如何预防雪球式幻觉，作者提出了两种方法：prompting 和 decoding or training methods。</p>
+<h3 id="prompting"><a href="#prompting" class="headerlink" title="prompting"></a>prompting</h3><p>无需赘述，就是通过设计prompt鼓励模型在答案之前生成推理链来实现更好的效果。但是如以往的工作（Kushal Arora， Layla El Asri， Hareesh Bahuleyan， and Jackie Cheung. 2022. Why exposure bias matters: An imitation learning perspective of error accumulation in language generation.）中提到的那样，在LLMs中一个错误往往会触发更多的错误，于是作者通过实验发现这种方法并不十分有效，因此又开发了第二类方法——算法修正。</p>
+<h3 id="decoding-or-training-methods"><a href="#decoding-or-training-methods" class="headerlink" title="decoding or training methods"></a>decoding or training methods</h3><ol>
+<li>beam search。前面提到过，一旦模型生成了一些确认答案的词汇，它们就会保留在上下文中并影响后续的生成。因此，缓解雪球式幻觉的一个潜在方法就是beam search，具体来说就是在decoding过程中的每个时间步都维护一个高概率序列束，而不是单个序列。在下一时间步，对当前beam中的每个序列候选分别生成新的词，并计算新的序列概率，并再次保留具有top-k高概率的新序列束进入下一个时间步，依此类推。其目的应该是缓解初始答案出错导致的雪球式幻觉。</li>
+<li>学习策略。前面是解码阶段的缓解方法，训练阶段也有自己的缓解方法——在生成答案之前，让模型产生推理链或者在backtracking data上进行微调（指的是先给出一个问题，再给出一个错误的解决方案，然后在给出正确的解决方案之前添加“抱歉，那是不正确的”之类的短语；其目的应该是为了缓解曝光偏差导致的雪球式幻觉——在训练过程中，语言模型只接触到金标准历史，但在推理过程中，上下文中包含可能有错的以往的预测）。</li>
+</ol>
+<h1 id="Chain-of-Verification-Reduces-Hallucination-in-Large-Language-Models"><a href="#Chain-of-Verification-Reduces-Hallucination-in-Large-Language-Models" class="headerlink" title="Chain-of-Verification Reduces Hallucination in Large Language Models"></a>Chain-of-Verification Reduces Hallucination in Large Language Models</h1><h2 id="背景-1"><a href="#背景-1" class="headerlink" title="背景"></a>背景</h2><ol>
+<li>在长文本生成任务中，幻觉的一个来源就是曝光偏差。</li>
+<li>独立地验证问题比在上下文中进行验证更加准确。</li>
+<li>注意到自己生成内容中存在幻觉的模型,往往会重复这些幻觉，而不是改正它。</li>
+</ol>
+<h2 id="本文的工作-1"><a href="#本文的工作-1" class="headerlink" title="本文的工作"></a>本文的工作</h2><p>Chain-of-Verification (COVE)的流程大致如下：</p>
+<ol>
+<li>给定问题，让LLMs生成一个初始的响应。</li>
+<li>给定问题和初始响应，让LLMs设计一系列的验证问题来对初始响应进行自我检查。</li>
+<li>独立地回答这些验证问题，然后检查初始响应和验证回答之间的一致性。</li>
+<li>根据找出的不一致性和之前的内容，生成最终的响应。</li>
+</ol>
+<p>简单的示例如下图所示：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/20606/CoVe.png" alt="CoVe.png"></p>
+<p>在这四个步骤中，第1、2、4步都是可以通过单个prompt实现的，第三步作者则是设计了四种变体：联合式，两步式，分解式（这一步其实可以使用工具，如搜索引擎或外部文档等等，但是作者只使用了LLMs本身），分解修正式。</p>
+<h3 id="联合式"><a href="#联合式" class="headerlink" title="联合式"></a>联合式</h3><p>第2、3步是使用一个prompt完成的。</p>
+<h3 id="两步式"><a href="#两步式" class="headerlink" title="两步式"></a>两步式</h3><p>联合式变体有一个问题就是由于两个步骤是基于一个prompt完成的，那么LLMs对于验证问题的响应就一定会受到之前生成的初始响应的影响。如我们之前所述，这样显然会增加雪球式幻觉和重复的可能性，让验证问题的答案趋同于初始响应，以至于难以判别是否有幻觉产生。因此作者将这两个步骤分开进行，在第二步的给定上下文中只包含问题，而不包含初始响应。</p>
+<h3 id="分解式"><a href="#分解式" class="headerlink" title="分解式"></a>分解式</h3><p>这种方式是要对所有的问题都进行独立的问答。这样做除了可以消除初始响应的影响，还可以消除答案之间的影响。具体做法是先将第2步中生成的所有问题分解为一个个独立的问题，然后并行地进行问答。</p>
+<h3 id="分解修正式"><a href="#分解修正式" class="headerlink" title="分解修正式"></a>分解修正式</h3><p>这一方式是在分解式的基础上添加了一个验证步，具体做法是将初始响应、验证问题以及对其的响应一起作为输入，让LLMs判断是否产生了不一致现象。</p>
+<h2 id="方法的效果"><a href="#方法的效果" class="headerlink" title="方法的效果"></a>方法的效果</h2><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/20606/results.png" alt="results.png"></p>
+<h1 id="关于-exposure-bias-问题"><a href="#关于-exposure-bias-问题" class="headerlink" title="关于 exposure bias 问题"></a>关于 exposure bias 问题</h1><p>简单来说,exposure bias指的是在训练大语言模型过程中,模型只能看到人工提供的训练数据,而看不到自己生成的序列。这导致模型在测试时生成的序列质量可能不如训练数据,从而对下游任务产生负面影响。</p>
+<p>主要有以下几个方面的原因:</p>
+<ol>
+<li>模型只见过真实数据分布,没有接触到自己生成序列的分布。这导致模型对自己的输出分布估计不准确。</li>
+<li>模型无法评估自己生成序列的质量。它不知道哪些生成的内容是错误的或不合逻辑的。</li>
+<li>在训练过程中,模型总是以真实数据作为下一个输入,而不是模型生成的序列。这导致测试时模型不习惯自己的生成结果作为输入。</li>
+<li>有evidence显示exposure bias会导致模型生成内容的多样性不足。</li>
+</ol>
+<p>解决exposure bias的常见方法包括:</p>
+<ol>
+<li>数据增强,给模型提供更多样化的训练数据。</li>
+<li>使用reinforcement learning的方法,允许模型评估自己生成内容的质量。</li>
+<li>在训练过程中,有一定概率使用模型生成的序列,而不是真实数据作为下一个输入,让模型适应自己的输出。</li>
+<li>在测试时使用beam search等搜索算法生成多个候选序列,而不是单次输出。</li>
+</ol>
+<p>总体来说,exposure bias依然是困扰大模型的一个重要问题,需要通过数据和算法手段综合解决。</p>
+<h1 id="关于减轻幻觉的方法"><a href="#关于减轻幻觉的方法" class="headerlink" title="关于减轻幻觉的方法"></a>关于减轻幻觉的方法</h1><p><a target="_blank" rel="noopener" href="https://browse.arxiv.org/pdf/2309.11495.pdf">论文</a>中的相关工作将减轻幻觉的主要方法粗略地分为三类：训练时修正，生成时修正以及使用工具增强。</p>
+<ol>
+<li>训练时修正。通过训练或者调整编码器-解码器或仅解码器语言模型的权重来改进生成内容,以减少幻觉生成的概率。例如使用强化学习，对比学习等方法。</li>
+<li>生成时修正。在LLMs的基础上使用推理决策，使得到的结论更加可靠。例如考虑生成token的概率来检测幻觉，考虑LLMs输出的不一致性来检测幻觉，使用多个LLMs进行“辩论”来检测幻觉等等。</li>
+<li>使用工具增强。使用外部工具，而不是仅依靠语言模型本身的能力来减轻幻觉现象。例如使用外部事实文档，使用CoT验证，使用事实检查工具等等。</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/20606.html">https://dreamtomb.github.io/posts/20606.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/35052.html" title="2023-11-7论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023-11-7论文笔记</div></div></a></div><div class="next-post pull-right"><a href="/posts/878.html" title="Active RAG_DoLa"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Active RAG_DoLa</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/17086.html" title="2023-11-21论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-21</div><div class="title">2023-11-21论文笔记</div></div></a></div><div><a href="/posts/35052.html" title="2023-11-7论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-07</div><div class="title">2023-11-7论文笔记</div></div></a></div><div><a href="/posts/62963.html" title="2023-12-05论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-04</div><div class="title">2023-12-05论文笔记</div></div></a></div><div><a href="/posts/63715.html" title="2023-12-19论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-12-19</div><div class="title">2023-12-19论文笔记</div></div></a></div><div><a href="/posts/32612.html" title="A Survey of Large Language Models论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-06</div><div class="title">A Survey of Large Language Models论文笔记</div></div></a></div><div><a href="/posts/63332.html" title="A Survey on In-context Learning"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-24</div><div class="title">A Survey on In-context Learning</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Contrastive-Decoding-Open-ended-Text-Generation-as-Optimization"><span class="toc-number">1.</span> <span class="toc-text">Contrastive Decoding: Open-ended Text Generation as Optimization</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%83%B3%E8%A6%81%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.1.</span> <span class="toc-text">想要解决的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%81%B5%E6%84%9F%E6%9D%A5%E6%BA%90"><span class="toc-number">1.2.</span> <span class="toc-text">灵感来源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">使用的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E6%95%88%E6%9E%9C"><span class="toc-number">1.4.</span> <span class="toc-text">方法效果</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#How-Language-Model-Hallucinations-Can-Snowball"><span class="toc-number">2.</span> <span class="toc-text">How Language Model Hallucinations Can Snowball</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E8%A8%80"><span class="toc-number">2.1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">2.2.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E6%96%87%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="toc-number">2.3.</span> <span class="toc-text">本文的工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%91%E7%8E%B0"><span class="toc-number">2.3.1.</span> <span class="toc-text">发现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="toc-number">2.3.2.</span> <span class="toc-text">数据集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A5%E6%BA%90"><span class="toc-number">2.3.3.</span> <span class="toc-text">来源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C"><span class="toc-number">2.3.4.</span> <span class="toc-text">实验</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E9%A2%84%E9%98%B2%E9%9B%AA%E7%90%83%E5%BC%8F%E5%B9%BB%E8%A7%89"><span class="toc-number">2.4.</span> <span class="toc-text">如何预防雪球式幻觉</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#prompting"><span class="toc-number">2.4.1.</span> <span class="toc-text">prompting</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#decoding-or-training-methods"><span class="toc-number">2.4.2.</span> <span class="toc-text">decoding or training methods</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Chain-of-Verification-Reduces-Hallucination-in-Large-Language-Models"><span class="toc-number">3.</span> <span class="toc-text">Chain-of-Verification Reduces Hallucination in Large Language Models</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF-1"><span class="toc-number">3.1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E6%96%87%E7%9A%84%E5%B7%A5%E4%BD%9C-1"><span class="toc-number">3.2.</span> <span class="toc-text">本文的工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%81%94%E5%90%88%E5%BC%8F"><span class="toc-number">3.2.1.</span> <span class="toc-text">联合式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E6%AD%A5%E5%BC%8F"><span class="toc-number">3.2.2.</span> <span class="toc-text">两步式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E8%A7%A3%E5%BC%8F"><span class="toc-number">3.2.3.</span> <span class="toc-text">分解式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E8%A7%A3%E4%BF%AE%E6%AD%A3%E5%BC%8F"><span class="toc-number">3.2.4.</span> <span class="toc-text">分解修正式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E7%9A%84%E6%95%88%E6%9E%9C"><span class="toc-number">3.3.</span> <span class="toc-text">方法的效果</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E-exposure-bias-%E9%97%AE%E9%A2%98"><span class="toc-number">4.</span> <span class="toc-text">关于 exposure bias 问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E5%87%8F%E8%BD%BB%E5%B9%BB%E8%A7%89%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">5.</span> <span class="toc-text">关于减轻幻觉的方法</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

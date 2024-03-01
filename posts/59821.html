@@ -1,0 +1,220 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2022-9-19论文笔记 | DreamTomb</title><meta name="author" content="魏涛"><meta name="copyright" content="魏涛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="论文笔记《Cascaded Partial Decoder for Fast and Accurate Salient Object Detection》 提出了级联部分解码器框架，该框架丢弃了低层特征以降低深度聚合模型的复杂性，并利用生成的相对精确的注意力图来细化高层特征以提高性能。   由于整个网络的浅两层捕捉更多的是细节信息，深两层捕捉更多的是语义信息，所以选择第三层作为分界点。在第三层之后">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2022-9-19论文笔记">
+<meta property="og:url" content="https://dreamtomb.github.io/posts/59821.html">
+<meta property="og:site_name" content="DreamTomb">
+<meta property="og:description" content="论文笔记《Cascaded Partial Decoder for Fast and Accurate Salient Object Detection》 提出了级联部分解码器框架，该框架丢弃了低层特征以降低深度聚合模型的复杂性，并利用生成的相对精确的注意力图来细化高层特征以提高性能。   由于整个网络的浅两层捕捉更多的是细节信息，深两层捕捉更多的是语义信息，所以选择第三层作为分界点。在第三层之后">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2022-09-02T02:26:23.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:36:36.973Z">
+<meta property="article:author" content="魏涛">
+<meta property="article:tag" content="weekly_paper">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dreamtomb.github.io/posts/59821.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2022-9-19论文笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-01 17:36:36'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/default_top_img.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="DreamTomb"><span class="site-name">DreamTomb</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2022-9-19论文笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-09-02T02:26:23.000Z" title="发表于 2022-09-02 10:26:23">2022-09-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-01T09:36:36.973Z" title="更新于 2024-03-01 17:36:36">2024-03-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/weekly-paper/">weekly_paper</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2022-9-19论文笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="论文笔记"><a href="#论文笔记" class="headerlink" title="论文笔记"></a>论文笔记</h1><h2 id="《Cascaded-Partial-Decoder-for-Fast-and-Accurate-Salient-Object-Detection》"><a href="#《Cascaded-Partial-Decoder-for-Fast-and-Accurate-Salient-Object-Detection》" class="headerlink" title="《Cascaded Partial Decoder for Fast and Accurate Salient Object Detection》"></a>《Cascaded Partial Decoder for Fast and Accurate Salient Object Detection》</h2><ol>
+<li><p>提出了级联部分解码器框架，该框架丢弃了低层特征以降低深度聚合模型的复杂性，并利用生成的相对精确的注意力图来细化高层特征以提高性能。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/cascaded_partial_decoder.png" alt="cascaded_partial_decoder"></p>
+</li>
+<li><p>由于整个网络的浅两层捕捉更多的是细节信息，深两层捕捉更多的是语义信息，所以选择第三层作为分界点。<strong>在第三层之后分出两个分支，一个是注意力分支，一个是显著性分支，前者使用深三层特征送入部分解码器，生成初始显著性图，此图送入整体注意力模块，获得增强的注意力矩阵。该注意力矩阵被送入显著性分支帮助精细化第三层的特征，这样的方式可以帮助去除原来第三层特征中的干扰信息</strong>，但同时，如果干扰信息被分类为显著性区域，那么也会极大地影响分割结果，于是就有了整体注意力模块。其公式如下：<br>$$<br>S_h&#x3D;MAX\left(f_{min_max}\left(Conv_g\left(S_i,k\right)\right),S_i\right)<br>$$</p>
+</li>
+<li><p>部分解码器模块就是魔改的RFB模块。</p>
+</li>
+</ol>
+<h2 id="《CAGNet-Content-Aware-Guidance-for-Salient-Object-Detection》"><a href="#《CAGNet-Content-Aware-Guidance-for-Salient-Object-Detection》" class="headerlink" title="《CAGNet: Content-Aware Guidance for Salient Object Detection》"></a>《CAGNet: Content-Aware Guidance for Salient Object Detection》</h2><ol>
+<li><p>提出了CAGNet来使前景背景更容易被区分，抑制非显著性区域的显著性外观，并为显著性区域的不同外观的子区域分配同样的标签。整个网络分为三个部分：特征提取网络（FEN），特征引导网络（FGN），特征融合网络（FFN），网络的结构示意图如下图所示。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/CAGNet.png" alt="CAGNet"></p>
+</li>
+<li><p>提出了多尺度特征提取模块（Multi-scale Feature Extraction Module ，MFEM），使用全局卷积网络GCNs（用于解决空洞卷积造成的网格效应），允许每一级别的网络获取多尺度上下文信息。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/MFEM.png" alt="MFEM"></p>
+</li>
+<li><p>提出了特征引导网络。高级特征在低级特征的引导下可以让显著性区域和非显著性区域更加容易区分，解决“非显著性区域拥有显著性特征”的问题；低级特征在高级特征的引导下可以产生更引人注意的特征，解决“显著性区域中不同外观的子区域标签不一致”的问题。该模块的思想本质就是将高级特征和低级特征进行拼接，然后通过卷积等操作产生通道权重和空间权重。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/FGM.png" alt="FGM"></p>
+</li>
+<li><p>设计了新的特征融合网络。在该部分中，作者设计了一个新的融合模块—— Residual Refifinement Module ，即RRM模块，模块的结构示意图如下图所示。该模块同时使用了注意力和残差学习的思想，中间的支路是残差学习，左侧的支路是注意力。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/RRM.png" alt="RRM"></p>
+</li>
+<li><p>设计了一个新的损失函数，它比交叉熵更优秀。<br>$$<br>L&#x3D;\alpha_1L_p+\alpha_2L_R+\alpha_3L_{MAE}<br>$$</p>
+</li>
+</ol>
+<h2 id="《Effective-Fusion-Factor-in-FPN-for-Tiny-Object-Detection》"><a href="#《Effective-Fusion-Factor-in-FPN-for-Tiny-Object-Detection》" class="headerlink" title="《Effective Fusion Factor in FPN for Tiny Object Detection》"></a>《Effective Fusion Factor in FPN for Tiny Object Detection》</h2><ol>
+<li><p>作者发现在小目标检测中，随着深层向浅层传递信息的增加，模型的性能是先增加后减少的。于是作者将融合因子定义为FPN中相邻两层特征融合时较浅层的加权系数，这篇论文的主要工作就是研究如何找到一个合适的融合因子。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/EFF.png" alt="EFF"></p>
+</li>
+<li><p>作者使用四种方式生成融合因子：暴力列举法，损失函数优化学习法，自注意力模块生成法，以及统计信息计算法。暴力法不合适，注意力法计算量大，学习法的表现不如暴力法，而统计法的表现很好而且没有增加推理时的计算量。</p>
+</li>
+<li><p>作者认为不同的层能够检测到的目标数目是不同的，这就导致不同层的训练样本数量不同，不同层对参数更新的贡献不同。因此作者认为对于那些训练样本多的层，应该分配一个小的权重，来保证各层对模型参数更新的贡献大致相同。</p>
+</li>
+<li><p>融合因子的数学解释。下图以C4作为例子，当使用较大的权重时，其将获得更多用于浅层检测任务的信息，当使用较小的权重时，其将获得更多用于深层检测任务的信息。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/gradient.png" alt="gradient"></p>
+</li>
+</ol>
+<h2 id="《Progressive-Self-Guided-Loss-for-Salient-Object-Detection》"><a href="#《Progressive-Self-Guided-Loss-for-Salient-Object-Detection》" class="headerlink" title="《Progressive Self-Guided Loss for Salient Object Detection》"></a>《Progressive Self-Guided Loss for Salient Object Detection》</h2><ol>
+<li><p>模型的核心思想是将SOD模型的训练过程分解为几个步骤。对于每一个步骤，该模型都会提供一些可行的训练目标，以降低训练难度。因此，它的输出可以在这逐步的训练中被逐步优化。具体而言，在当前网络预测中应用模拟形态学闭合操作，可以去除前景物体内部的小孔，减少错误检测区域，生成新的辅助训练监督作为整体损失函数的一部分。更重要的是，这些新创建的训练目标随着网络预测的逐步优化而不断细化，可以为训练过程提供持续正确的指导。因此，SOD模型可以通过这些渐进式监督来逐步突出更完整的显著目标。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/MS_FAM.png" alt="MS_FAM"></p>
+</li>
+<li><p>提出了新的多尺度特征聚合模块MS-FAM，通过分支级的注意力机制来捕捉并自适应地聚合它们。MS-FAM使用了空洞卷积，inception模块，注意力机制以及残差学习，并被放置于侧向连接中进行多尺度特征融合。</p>
+</li>
+<li><p>提出了新的损失函数——渐进式自引导损失（progressive self-guided loss，PSG Loss），通过在模型预测上模拟形态学闭合操作（先对模型的预测图进行膨胀操作，然后进行腐蚀操作），来逐步创建辅助训练监督，逐步地引导训练过程。为了避免全0的显著性预测导致的PSG loss的零梯度问题，PSG loss只能作为一个辅助loss，需要配合一个正常的loss，二者的加权和组成模型的整体loss，辅助loss和正常loss选取的损失函数相同，都是BCE loss+Dice loss，只是计算loss的对象分别是预测和gt以及预测和处理之后的预测。考虑到膨胀和腐蚀操作的速度很慢，因此使用最大池化操作代替膨胀操作，并使用膨胀之后的预测图和gt进行取交集操作来近似代替腐蚀操作。这种取交集操作有两个优点：首先保证了$SM_{pgt} \subseteq SM_{gt}$，其次这种操作总是可以基于当前预测产生更好的结果，并且该结果可用于指导模型逐步探索当前预测的邻近区域。总的来说，模拟形态学操作可用如下公式表示:$f(SM_{pred} )&#x3D;e(d(SM_{pred} ) )\approx maxpool(SM_{pred} )\cap SM_{gt}$，</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/PSG.png" alt="PSG"></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/losses.png" alt="losses"></p>
+</li>
+<li><p>BCE等像素级loss的缺点：首先，由于他们只考虑了标签和预测之间的像素级的差异，而没有考虑像素之间的空间关系和依赖，BCEloss不能帮助揭示显著性区域内部像素和背景像素之间的关系，因此会导致模糊的边界和显著性目标内部的一些误检测区域。其次，由于这些loss为前景像素和背景像素赋予了同样的权重，因此使得SOD变成了一个类别不平衡问题（背景像素大多数情况下远多于前景像素），这会使得训练出的模型因为标签分布的偏差而具有偏差先验，会倾向于将未知像素预测为背景，进一步会导致预测出不完整的显著性区域。</p>
+</li>
+</ol>
+<h2 id="《Bifurcated-Backbone-Strategy-for-RGB-D-Salient-Object-Detection》"><a href="#《Bifurcated-Backbone-Strategy-for-RGB-D-Salient-Object-Detection》" class="headerlink" title="《Bifurcated Backbone Strategy for RGB-D Salient Object Detection》"></a>《Bifurcated Backbone Strategy for RGB-D Salient Object Detection》</h2><ol>
+<li><p>设计了一个全新的级联细化网络。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/BBSNet.png" alt="BBSNet"></p>
+</li>
+<li><p>使用分叉主干策略，将多层次特征重新分组为教师和学生特征，深三层是教师特征，浅三层是学生特征。作者的动机是因为发现教师特征提供的是富有判别性且没有冗余细节的语义信息，可以显著地缓解低维度特征中的干扰信息。</p>
+</li>
+<li><p>GCM模块是RFB模块的改进版，只是多了两个分支，可以更好地拥有全局感受野。PTM是为了渐进地增大第二阶段的解码结果，而非直接进行4倍上采样，这样可以使得结果更精细。</p>
+</li>
+<li><p>引入深度增强模块（depth-enhanced module，DEM），从通道和空间角度挖掘深度模态的信息线索，以更好地融合RGB特征和深度特征。该模块由一个通道注意力和一个空间注意力组成，通道注意力是将特征图的每个通道进行全局最大池化之后送入多层感知机，然后将感知机的输出作为通道权重和输入特征图相乘。空间注意力是将特征图的每个点沿着通道维度进行全局最大池化，进行卷积之后作为每个像素点的权重和输入特征图相乘。</p>
+</li>
+<li><p>深度模态和RGB模态的提取器并不共享权重，这是因为两种模态有着很大的差异。因此作者设计了深度适应模块来考虑两种模态的不同，使得二者可以使用同一个特征提取器而不会有很大的性能下降。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/posts/59821/DAM.png" alt="DAM"></p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io">魏涛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://dreamtomb.github.io/posts/59821.html">https://dreamtomb.github.io/posts/59821.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dreamtomb.github.io" target="_blank">DreamTomb</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/weekly-paper/">weekly_paper</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/58810.html" title="2022-9-26论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2022-9-26论文笔记</div></div></a></div><div class="next-post pull-right"><a href="/posts/38271.html" title="Deep Signature Transforms"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Deep Signature Transforms</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/60232.html" title="2022-10-17论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-09-02</div><div class="title">2022-10-17论文笔记</div></div></a></div><div><a href="/posts/11086.html" title="2022-10-24论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-09-02</div><div class="title">2022-10-24论文笔记</div></div></a></div><div><a href="/posts/58810.html" title="2022-9-26论文笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-09-02</div><div class="title">2022-9-26论文笔记</div></div></a></div><div><a href="/posts/713.html" title="Concealed Object Detection"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-11-07</div><div class="title">Concealed Object Detection</div></div></a></div><div><a href="/posts/59520.html" title="PraNet Parallel Reverse Attention Network for Polyp Segmentation"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-10-31</div><div class="title">PraNet Parallel Reverse Attention Network for Polyp Segmentation</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">魏涛</div><div class="author-info__description">1. 星河璀璨，我虽仰望，却也借这星光，低头沉默却坚定地走下去。 2. 一切焦虑都来源于想得太多而做的太少。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">98</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">19</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/dreamtomb" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">公告栏信息</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0"><span class="toc-number">1.</span> <span class="toc-text">论文笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%80%8ACascaded-Partial-Decoder-for-Fast-and-Accurate-Salient-Object-Detection%E3%80%8B"><span class="toc-number">1.1.</span> <span class="toc-text">《Cascaded Partial Decoder for Fast and Accurate Salient Object Detection》</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%80%8ACAGNet-Content-Aware-Guidance-for-Salient-Object-Detection%E3%80%8B"><span class="toc-number">1.2.</span> <span class="toc-text">《CAGNet: Content-Aware Guidance for Salient Object Detection》</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%80%8AEffective-Fusion-Factor-in-FPN-for-Tiny-Object-Detection%E3%80%8B"><span class="toc-number">1.3.</span> <span class="toc-text">《Effective Fusion Factor in FPN for Tiny Object Detection》</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%80%8AProgressive-Self-Guided-Loss-for-Salient-Object-Detection%E3%80%8B"><span class="toc-number">1.4.</span> <span class="toc-text">《Progressive Self-Guided Loss for Salient Object Detection》</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%80%8ABifurcated-Backbone-Strategy-for-RGB-D-Salient-Object-Detection%E3%80%8B"><span class="toc-number">1.5.</span> <span class="toc-text">《Bifurcated Backbone Strategy for RGB-D Salient Object Detection》</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63715.html" title="2023-12-19论文笔记">2023-12-19论文笔记</a><time datetime="2023-12-19T09:24:57.000Z" title="发表于 2023-12-19 17:24:57">2023-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/62963.html" title="2023-12-05论文笔记">2023-12-05论文笔记</a><time datetime="2023-12-04T12:58:41.000Z" title="发表于 2023-12-04 20:58:41">2023-12-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/17086.html" title="2023-11-21论文笔记">2023-11-21论文笔记</a><time datetime="2023-11-21T10:33:12.000Z" title="发表于 2023-11-21 18:33:12">2023-11-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/35052.html" title="2023-11-7论文笔记">2023-11-7论文笔记</a><time datetime="2023-11-07T10:09:42.000Z" title="发表于 2023-11-07 18:09:42">2023-11-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/20606.html" title="2023-10-10论文笔记">2023-10-10论文笔记</a><time datetime="2023-09-26T08:31:45.000Z" title="发表于 2023-09-26 16:31:45">2023-09-26</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 魏涛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.8/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
